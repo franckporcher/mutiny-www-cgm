@@ -1,0 +1,17 @@
+defvar      =(* )  bleu 3       (0,0,255)       0000ff
+getval      $(  )  bleu ciel    (57,203,255)    39cbff
+deflist     L(  )  turquoise 4  (0,157,55)      009d37
+listval     @(  )  turquoise 2  (0,228,55)      00e437
+multseq     *(  )  diagramme 8  (171,212,35)    abd423
+func        #(  )  rouge 3      (250,0,0)       ff0000      
+iterator    I(  )  mauve 2      (159,0,252)     9f00fc
+lazy        Q(  )  magenta 5    (153,0,152)     990098  
+progn       P(  )  orange 4     (200,42,19)     c82a13  
+prog1       1(  )  orange 2     (250,154,34)    fa9a22      
+evalmeta    M(  )  saumon       (251,124,130)   fb7c82
+string      "   "  Magenta 3    (255,0,255)     ff00ff
+quote       '(  )  Diagramme 1  (25,64,132)     194084
+qquote      "(  )  cyan 3       (43,206,203)    2bcecb      
+cond        ?(  )  jaune 3      (200,155,29)    c89b1d  
+warning     W(  )  bleu ciel 2  (62,97,162)     3e61a2  
+literal            gris 7       (96,96,96)      606060

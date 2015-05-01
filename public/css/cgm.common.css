@@ -1,0 +1,400 @@
+/*
+ * CGM COMMON main style sheet
+ *
+ * Project : TAHITI Mutiny
+ * 
+ * Copyright(C) 2015 - Franckys.com
+ * All rights reserved
+ */
+html, body {
+	margin:      0;
+    border:      0;
+	padding:     0;
+    width:       100%;
+    height:      100%;
+    overflow:    hidden;
+}
+
+body {
+    position:    relative;
+    display:     block;
+    height:      auto;
+    top:         0;
+    left:        0;
+    background-color: white;
+    font-family: Geneva, Tahoma, "Bitstream Vera Sans", Verdana, Lucida, sans-serif;
+    font-size:   12px;
+    color:       #333;
+}
+
+
+/*
+ *========================
+ * GLOBAL STYLES
+ *========================
+ */
+table, tbody, tr, td {
+    border-collapse: collapse;
+    padding: 0;
+    margin:  0;
+    border:  0;
+}
+
+.container {
+    position:       relative;
+    display:        block;
+    width:          1280px;
+    margin-right:   auto;
+    margin-left:    auto;
+    height:         100%;
+}
+
+
+/* Foreground & background solidify on hover */
+.fadefg {
+    opacity: 0.7;
+            transition: opacity .5s ease-in-out;
+       -moz-transition: opacity .5s ease-in-out;
+    -webkit-transition: opacity .5s ease-in-out;
+}
+.fadefg:hover {
+    opacity: 1;
+}
+
+.fadebg {
+            transition: background .25s ease-in-out;
+       -moz-transition: background .25s ease-in-out;
+    -webkit-transition: background .25s ease-in-out;
+}
+
+
+.dynamic-value {
+    color: rgba(255, 165, 0, 1);   /* orange; */
+}
+
+
+.left {
+    float: left;
+}
+.right {
+    float: right;
+}
+
+
+.lspace {
+    padding-left: 1em;
+}
+.rspace {
+    padding-right: 1em;
+}
+
+
+.btext, .mtext, .ttext {
+    display: table;
+    height: 100%;
+}
+.ttext > span {
+    display: table-cell;
+    vertical-align: top;
+}
+.mtext > span {
+    display: table-cell;
+    vertical-align: middle;
+}
+.btext > span {
+    display: table-cell;
+    vertical-align: bottom;
+}
+
+
+.header1.title {
+    font-weight: bold;
+    color:       #444;
+    font-size:   14px;
+}
+.header1.subtitle {
+    font-weight: normal;
+    color:       rgba(65, 131, 196, 1);    /* Bleu métallique */
+    font-size:   24px;
+    font-stretch: expanded;   
+}
+
+
+.header2.title {
+    font-weight: normal;
+    color:       rgba(65, 131, 196, 1);
+}
+
+
+.separator {
+    height:      100%;
+    margin:      0 2em;
+    border:      0;
+    border-left: 1px solid #e5e5e5;
+    width:       0;
+}
+
+
+
+/* 
+ *========================
+ * COMMON HEADER
+ *========================
+ */
+/* hors tout 1280 x 110 */ 
+#cgm-header    {
+    position:           relative;
+    display:            block;
+    top:                0;
+    left:               0;
+    margin:             0 0 61px 0;
+    padding:            10px 0;
+    border:             0;
+    border-bottom:      1px solid #e5e5e5;
+    height:             28px;
+    width:              100%;
+    min-width:          1280px;
+    background-color:   #f5f5f5; /* #f2f2f0; */
+}
+
+
+/* x 48 */
+#cgm-header-session-container {
+    position:           absolute;
+    display:            block;
+    float:              right;
+    top:                -10px;
+    right:              0;
+    height:             48px;
+    margin:             0;
+    padding:            0;
+    border:             0;
+    text-align:         right;
+}
+
+#cgm-header-session-user, #cgm-header-session-time {
+    display:            block;
+    height:             16px;
+    text-align:         right;
+    margin:             0;
+    padding:            4px 0;
+    border:             0;
+}
+#cgm-header-session-user {
+    vertical-align: top;
+    float:          right;
+    color:          rgba(255, 165,   0, 1); /* orange; */
+    font-weight:    bold;
+}
+#cgm-header-session-time {
+    vertical-align: bottom;
+    color:          #aaa;
+    font-size:      80%;
+    clear:          both;
+}
+
+#cgm-header-close-session-container {
+    display:            block;
+    float:              right;
+    margin:             0;
+    padding:            2px 0 2px 20px;
+    border:             0;
+    height:             20px;
+    vertical-align:     middle;
+}
+
+#cgm-header-close-session-container button {
+    margin:             0;
+    padding:            2px 10px;
+    color:              #aaa;
+    cursor:             pointer;
+}
+#cgm-header-close-session-container button:hover {
+    color:              #444;
+}
+#cgm-header-close-session-container button:active {
+    color:              white;
+}
+
+
+/* Loading widget (24 x 24) - In the middle of the bar */
+#cgm-loading-widget {
+    position:           absolute;
+    top:                2px;
+    left:               calc(50% - 12px);
+    margin:             0;
+    padding:            0;
+    border:             0;
+    width:              24px;
+    height:             24px;
+    display:            none;
+}
+
+#flash-container    {
+    display:            table;
+    position:           absolute;
+    top:                59px;
+    height:             16px;
+    width:              100%;
+    margin-right:       auto;
+    margin-left:        auto;
+    margin-top:         0;
+    margin-bottom:      0;
+    padding:            0;
+    border-collapse:    collapse;
+    border:             0;
+    text-align:         center;
+    font-family:        Palatino, "New York", Georgia,  "Times New Roman", serif;
+}
+
+#flash {
+    display:        table-cell;
+    vertical-align: middle;
+    text-align:     center;
+}
+#flash.log  { 
+    color: #666;                        /* gris */
+}
+#flash.info { 
+    color: rgba( 65, 131, 196, 1);      /* Bleu métallique */
+}
+#flash.warn { 
+    color: rgba(255, 165,   0, 1);      /* orange */
+}
+#flash.warn:before { content: '! ';}
+#flash.err  { 
+    color: red; 
+    font-weight:    bold;
+    font-size:      120%;
+}
+#flash.err:before  { content: '!! ';}
+#flash.err:after   { content: ' !!';}
+
+
+
+/* 
+ *========================
+ * COMMON FOOTER
+ *========================
+ */
+#cgm-footer    {
+    position:           relative;
+}
+
+
+/* 
+ *========================
+ * COMMON ENV (DEBUG)
+ *========================
+ */
+#cgm-env    {
+    position:           relative;
+}
+
+
+/* 
+ *========================
+ * COMMON SESSION
+ *========================
+ */
+#cgm-session    {
+    position:           fixed;
+    top:                110px;
+    bottom:             0;
+    left:               0;
+    right:              0;
+    width:              100%;
+    height:             100%;
+    padding:            0;
+    margin:             0;
+    border:             0;
+    z-index:            10000;
+    background-color:   rgba(128,128,128,0.75);
+    display:            none;
+}
+
+#cgm-login-container {
+    position:           absolute;
+    top:                160px;
+    left:               calc(50% - 151px);
+    display:            block;
+    width:              302px;
+    margin-right:       auto;
+    margin-left:        auto;
+    padding:            30px;
+    border:             0;
+    background-color:   rgba(255,255,255,0.95);
+}
+
+#cgm-session form {
+    display:            block;
+    margin:             0;
+    padding:            0;
+    border:             0;
+    width:              100%;
+    height:             100%;
+}
+#cgm-session fieldset {
+    display:            block;
+    margin:             0;
+    padding:            30px;
+    border:             2px groove rgb(65, 131, 196) ;
+}
+
+#cgm-session legend {
+    color:              rgb( 65, 131, 196) ;            /* bleu métallique */
+    font-size:          120%;
+}
+
+#cgm-session label {
+    display:            block;
+    color:              #aaa;
+    text-align:         left;
+}
+label:after { content: ": " }
+
+/* overall 242 x ... */
+#cgm-session input {
+    display:            block;
+    margin:             5px 0 20px 0;
+    padding:            3px 5px;
+    border:             1px solid #aaa;
+    width:              240px;
+    font-size:          2em;
+    color:              rgba( 65, 131, 196, 1) ;            /* bleu métallique */
+    box-shadow:         0 0 5px #aaa;
+    background-color:   #fcfcfc;
+}
+
+#cgm-session input:focus {
+    border-color:       rgb( 65, 131, 196);             /* bleu métallique */
+    box-shadow:         0 0 5px rgb(65, 131, 196);
+    background-color:   #fefefe;
+}
+
+#cgm-session input[invalid] {
+    border-color:       rgb(255, 165, 0);      /* orange */
+    box-shadow:         0 0 5px rgb(255, 165, 0);
+}
+
+#cgm-session input[type="submit"] {
+    display:            block;
+    float:              right;
+    margin:             10px 0 20px 0;
+    padding:            5px 10px;
+    border:             1px solid rgb(65, 131, 196);
+    border-radius:      4px 4px 4px 4px;
+    font-size:          1em;
+    color:              #eee;
+    box-shadow:         none;
+    background-color:   rgba(65, 131, 196, 0.65);
+    width:              auto;
+    cursor:             pointer;
+}
+
+#cgm-session input[type="submit"]:hover {
+    box-shadow:         0 0 1px rgb(65, 131, 196);
+    background-color:   rgba( 65, 131, 196, 0.8) ;          /* bleu métallique */
+    color:              white;
+}
+

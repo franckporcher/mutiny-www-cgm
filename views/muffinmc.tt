@@ -1,0 +1,38 @@
+<div id="muffinmc">
+    <div class="container">
+        <div id="muffinmc-display">
+            <div id="muffinmc-display-header">
+                <div class="header2 left mtext title">
+                    <span class="dynamic-value lspace rspace" id="muffinmc-repl-nblines">0</span>
+                    <span>lignes</span>
+                </div>
+                <div class="header2 left separator"></div>
+                <div class="header2 left mtext title">
+                    <span class="dynamic-value rspace" id="muffinmc-repl-nbrequests">0</span>
+                    <span>Requêtes</span>
+                </div>
+                <div id="muffinmc-display-header-commands">
+                    <div id="muffinmc_get_repl_selection">Coller la Sélection</div>
+                    <div id="muffinmc_reset_repl">Effacer la console</div>
+                </div>
+            </div>
+
+            <!-- Where the REPL will install its view -->
+            <div id="muffinmc-repl-container"></div>
+        </div>
+
+        <div id="muffinmc-input">
+            <div id="muffinmc-demo">DEMO</div>
+            <div id="muffinmc-clear-input">Effacer</div>
+            <form id="muffinmc-input-form">
+                <textarea id="muffinmc-repl-input" 
+                    autofocus
+                    placeholder="[MuffinMC, pour vous servir] > ...">
+                </textarea>
+            </form>
+        </div>
+
+        <div id="muffinmc-logs">
+        </div>
+    </div>
+</div>

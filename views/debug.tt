@@ -1,0 +1,149 @@
+<div id="cgm-env">
+  <h3><a href="#" id="debug_show_env">ENVIRONNEMENT</a></h3>
+  <div id="debug_env" style="display: none;">
+    <% PERL %>
+        # Enable access to _private_keys and .private_keys
+        $Template::Stash::PRIVATE = undef;
+
+        use Data::Dumper;
+        $Data::Dumper::Indent    = 1;
+        $Data::Dumper::Quotekeys = 0;
+
+        my %env = ();
+
+        # PROG
+        $env{ 'PROG( NAME )' }  = $0;
+        $env{ 'PROG( PERL )' }  = $^X;
+        $env{ 'PROG( PERLV)' }  = $];
+        $env{ 'PROG( OS   )' }  = $^O;
+        $env{ 'PROG( PID  )' }  = $$;
+        $env{ 'PROG( UID  )' }  = $<;
+        $env{ 'PROG( EUID )' }  = $>;
+        $env{ 'PROG( GID  )' }  = $(;
+        $env{ 'PROG( EGID )' }  = $);
+
+        # @ARGV
+        my $i = 0;
+        foreach ( @ARGV ) {
+            $env{ sprintf('ARGV( %d )', $i++) } = $_;
+        }
+
+        # @INC
+        $i = 1;
+        foreach ( @INC ) {
+            $env{ sprintf('@INC-%d', $i++) } = $_;
+        }
+
+
+        # %ENV
+        foreach ( keys %ENV ) {
+            $env{ sprintf('ENV( %s )', $_) } = $ENV{$_};
+        }
+
+        # %INC
+        foreach ( keys %INC ) {
+            $env{ sprintf('INCLUDED_FILE( %s )', $_) } = $INC{$_};
+        }
+
+        $stash->set('_env', \%env);
+    <% END %>
+
+    <table>
+        <tbody>
+            <% FOREACH key IN _env.keys.sort %>
+              <tr>
+                <td style="vertical-align: top"><b><% key %></b></td>
+                <td><pre><% _env.$key %></pre></td>
+              </tr>
+            <% END %>
+        </tbody>
+    </table>
+  </div>
+
+
+  <h3><a href="#" id="debug_show_tt_stash">Template STASH</a></h3>
+  <div id="debug_tt_stash" style="display: none;">
+    <% PERL %>
+        my %dump = ();
+
+        foreach my $key ( keys %$stash ) {
+            my $dump = Dumper($stash->{$key});
+            $dump =~ s|\n|<br />|g;
+            $dump{$key} = $dump;
+        }
+
+        # All keys
+        $dump{ "ALL_STASH_KEYS (debug only)" } = Dumper( [ sort keys %dump ]);
+
+        $stash->set('_dump', \%dump);
+    <% END %>
+
+    <table>
+        <tbody>
+            <% FOREACH key IN _dump.keys.sort %>
+              <tr>
+                <td style="vertical-align: top"><b><% key %></b></td>
+                <td><pre><% _dump.$key %></pre></td>
+              </tr>
+            <% END %>
+        </tbody>
+    </table>
+  </div>
+
+  <h3><a href="#" id="debug_show_tt_config">TT Config</a></h3>
+  <div id="debug_tt_config" style="display: none;">
+    <% PERL %>
+        my %dump = ();
+
+        foreach my $key ( keys %{$context->{CONFIG}} ) {
+            my $dump = Dumper($context->{CONFIG}{$key});
+            $dump =~ s|\n|<br />|g;
+            $dump{$key} = $dump;
+        }
+
+        # All keys
+        $dump{ "ALL_CONTEXT_CONFIG_KEYS (debug only)" } = Dumper( [ sort keys %{$context->{CONFIG}} ] );
+
+        $stash->set('_dump', \%dump);
+    <% END %>
+
+    <table>
+        <tbody>
+            <% FOREACH key IN _dump.keys.sort %>
+              <tr>
+                <td style="vertical-align: top"><b><% key %></b></td>
+                <td><pre><% _dump.$key %></pre></td>
+              </tr>
+            <% END %>
+        </tbody>
+    </table>
+  </div>
+
+  <% PERL %>
+    delete $stash->{_dump};
+  <% END %>
+
+  <script type="text/javascript">
+      $('#debug_show_env').click(function() {
+          $('#debug_env').slideToggle('fast', function() {
+              true;
+          });
+          return false;
+      });
+
+      $('#debug_show_tt_stash').click(function() {
+          $('#debug_tt_stash').slideToggle('fast', function() {
+              true;
+          });
+          return false;
+      });
+
+      $('#debug_show_tt_config').click(function() {
+          $('#debug_tt_config').slideToggle('fast', function() {
+              true;
+          });
+          return false;
+      });
+   </script>
+
+</div>

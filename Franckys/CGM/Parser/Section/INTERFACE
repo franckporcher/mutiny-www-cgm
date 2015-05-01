@@ -1,0 +1,37 @@
+#----------------------------------------------------------------------------
+# Generic Getters (overload at your own risk)
+#----------------------------------------------------------------------------
+# my $section_name          = $section->name();
+#
+# my $nb_fields             = $section->nb_fields();
+#
+# my @all_headers           = $section->headers();
+# my @some_headers          = $section->headers( $index... );
+#
+# my @all_header_indexes    = $section->header_indexes(); # Returned in numerical sorted order
+# my @some_header_indexes   = $section->header_indexes( $header_name...);
+#
+# my @all_mandatory_fields  = $section->mandatory_fields();
+# my @some_mandatory_fields = $section->mandatory_fields( $index... );
+
+
+# my $headers_verbatim_row  = $section->headers_verbatim_row(); 
+
+# my @verbatim_rows         = $section->verbatim_rows(index, ...); 
+# my $nb_verbatim_rows      = $section->nb_verbatim_rows(); 
+
+# my @records               = $section->records(); 
+# my $nb_records            = $section->nb_records(); 
+
+# my $field_value           = $section->record_get_value( $record, $field_index );
+
+#----------------------------------------------------------------------------
+# MAY BE OVERLOADED
+#----------------------------------------------------------------------------
+# $section->dump();                         => HTML
+# $section->dump_record( $record )          => Called by dump() for each record
+# $html                     = $section->record_as_html($record) => HTML, called by above
+# my $bool                  = $section->is_field_mandatory($index);
+# my $bool                  = $section->need_eval( $field_index );
+# my $record                = $section->consolidate_record( $record );
+#----------------------------------------------------------------------------

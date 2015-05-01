@@ -1,0 +1,189 @@
+|Guide|		|h3|	|h4|	|h5|	|div|	|li|														
+		|Notion de "Variables"|																		
+					|Le système met à disposition de l'utilisateur l'utilisation de <i>variables</i>, sorte de récipients contenant une ou plusieurs valeurs accessibles via un nom.|															
+			|Nommage des variables|																	
+				|Régle de nommage des noms de variable|																
+					|Un <i>nom de variable</i> est une séquence de caractères de longueur arbitraire non nulle ne contenant aucun des caractères suivants, qui sont réservés par les systèmes de gestion sous-jacents : <quote double> ou <guillemet>, « : », « = », « , »,  <antislash> <barre verticale>|															
+				|Exemples de variables|																
+						|Pierre.Durand|														
+						|Collection_Force5#Couleurs|														
+						|Manteau_123#texture|														
+			|Valeurs des variables|																	
+					|La <i>valeur</i> d'une variable peut être <i>scalaire</i>, c'est à dire ne contenir qu'une seule valeur litérale ou bien multiple, et contenir dans ce cas un nombre plus élevé de valeurs distinctes. |															
+				|Valeur Scalaire|																
+					|Une valeur scalaire correspond à la notion habituelle de valeur unique (à opposer à la notion de valeurs multiples. Voir plus bas).
+Une valeur scalaire peut être un nombre entier (0, 1, 123), un nombre avec partie fractionnaire (le séparateur est la virgule : 3,14), ou des séquences quelconques de caractères .
+L'utilisation litérale de caractères d'espacement nécessite de placer la valeur entre  guillemets. Dans ce dernier cas, l'insertion d'un guillemet littéral devra être précédé d'un caractère antislash (barre de division inversée). De même pour protéger de l'interpolation certaines séquences fonctionnelles précisées plus bas.  |															
+					|Exemples de valeurs scalaires|															
+						|123|														
+						|3,14|														
+						|Pierre.Durand@mutiny.com|														
+						|"Franck Porcher, né le 2/11/60 (54)"|														
+						| France.Paris.XIXeme|														
+				|Valeur Multiples (listes)|																
+					|Une liste permet d'affecter à une variable de multiples valeurs scalaires.
+Une liste  débute par une parenthèse gauche et se termine par une parenthèse droite. Les éléments de la liste sont séparés par des point-virgules, et les espaces entre les valeurs ne comptent pas.|															
+					|La notation en intension 1..10 permet de générer les valeurs 1 à 10.|															
+			|Interpolation des variables|																	
+				|Définition|																
+					|L'opération d' « interpolation » consiste à substituer un nom de variable par sa valeur.
+
+On accède à la valeur d'une variable selon l'une des manières suivantes :
+   - Si var est le nom d'une variable scalaire, alors on accède à sa valeur en écrivant $(var).
+   - Si liste est le nom d'une variable de type liste, alors on accède à l'ensemble de ses valeurs en écrivant $(liste)
+   - Si liste est le nom d'une variable de type liste, alors on accède à sa 3ième valeur en écrivant $(liste)[3] (tous les indices sont comptés à partir de 1 et non de 0).
+   - Si X est le nom d'une variable de type liste, alors l'écriture $(#X) ou $(X.length) fournit le nombre d'éléments de X
+  
+Toute variable peut être interpolée dans une chaine ou dans une liste. Il n'y a pas de limite quant à la profondeur et le nombre d'imbrications.
+L'interpolation fonctionne de manière identique à l'intérieur ou l'extérieur des quotes.
+Pour empêcher une interpolation, préfixer le $ par un antislash|															
+				|Exemples|																
+					|Soit lettres = (a..c)  et chiffres = (0..9), alors la variable  combinaisons = ( $(lettres) ; $(chiffres) ) sera expansée en (a, b, c, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9). Alors que la variable ids=(''$(lettres).$(chiffres)'') sera expansée en une liste de 3 x 10 éléments : (a.0 ; a.1 ; a.2 ; . . . ; a.9 ; b.0 ; b.1 ; . . . ; b.9 ; c.1 ; . . . ; c.9) |															
+		|MuffinMC   –   Mutiny Flexible & Functional INline Macro Language|																		
+					|Présentation sommaire de MacroL|															
+			|Les macros reconnues|																	
+				|$(  )|	|$( varname )|															
+				|@(  )|	|@( var||liste indice…)|															
+				|#( )|	|#( fname arg…)|															
+				|*(  )|	|*( facteur liste )|															
+				|=(  )|	|=( varname value...)|															
+				|?(  )|	|?( cond vtrue vfalse)|															
+				|L(  )|																
+				|>(  )|																
+				|Q(  )|																
+				|I(  )|																
+				|E(  )|																
+				|W(  )|																
+			|Les fonctions|																	
+					|Le catalogue Général Mutiny a ajouté le support rudimentaire de fonctions calculées via la syntaxe $(( fonction(parametre, …) ))|															
+					|Les fonctions disponibles sont présentées plus bas.|															
+		|Variables prédéfinies|																		
+			|SN|	|$(SN)|	|Section Name : Nom de la section en cours|															
+			|SFN|	|$(SFN)|	|Sectino Field Name : Nom de la colonne en cours|															
+			|RN|	|$(RN)|	|Record Number : Numéro de l'enregistrement dans la section. La numérotation commence à 1.
+C'est en général la même chose que le numéro de la lignen sauf quand une ligne du catalogue génère plusieurs enregistrements.|															
+			|FN|	|$(FN)|	|Field Number : numéro de la colonne en cours [1 à $(NF) ]. La numérotation commence à 1 (Colonne A => 1, B => 2, etc.)|															
+			|NF|	|$(NF)|	|Number of Fields : Nombre de colonnes. Attention à ne pas confondre avec le champ précédent.|															
+			|ROW|	|$(ROW)|	|Variable dynamique dont la valeur correspondt à l'expansion de la chaine "$(SN)[$(RN)]", par exemple "Categories[1]"|															
+			|CELL|	|$(CELL)|	|Variable dynamique dont la valeur correspond à l'expansion de la chaine "$(ROW)[$(FN)]", par exemple "Categories[1][4]", qui est la même chose que "Categories[1].Nom"|															
+		|Variables automatiques de la section "Collections"|																		
+			|Collections[ <Id> ].ID|		|Numéro interne unique de la collection. Valeur numérique croissante désignant une collection donnée.|															
+			|Collections[ <Id> ].Nom|		|Nom de la collection (texte libre). Exemple : « Mutiny's Spirit ».  / !\ Attention aucun des caractères suivants n'est autorisé : TAB || \  , : ; # <> {} |															
+			|Collections[ <Id> ].Type|		|Décrit le "Type" de la collection :
+   0,1,2,3,4 → Collections Mutiny régulières       (500 collections possibles)
+   5,6,7       → Collections Mutiny « Collector »   (300 collections possibles)
+   8,9          → hors collections Mutiny                 (200 collections possibles)|															
+			|Collections[ <Id> ].Numero|		|Numéro unique de la collection dans le « Type » (1 à 99)|															
+			|Collections[ <Id> ].Store|		|Liste des magasins où sont vendus des articles de cette collection. Doit être une ou plusieurs valeurs de la variable « Common.Stores ». Par défaut, ce sont tous les magasins définis par cette variable.|															
+			|Collections[ <Id> ].DateLancement|		|Date de lancement de la collection sur les sites de vente.
+Format YYYYMMDD (8chiffres). Ewemple 20150401 (1er avril 2015).
+/!\ Utiliser la valeur spéciale 00000000 pour anticiper une collection à venir.
+Dans le premier cas, il suffira alors de mettre une date, même dans le futur, pour figer la date de lancement et rendre les produits disponibles à la vente à cette date.|															
+		|Variables automatiques de la section "Categories"|																		
+			|Categories[<Id>].Id|		|Numéro interne unique, numérique, croissant désignant une collection donnée|															
+			|Categories[<Id>].Nom|		|Nom de la catégorie. / !\ Attention aucun des caractères suivants n'est autorisé : TAB || \  , : ; # <> {}
+Utiliser un nom court et descriptif. Bien choisir les mots car les clients se baseront dessus lors du parcours de la boutique.|															
+			|Categories[<Id>].EstActif|		|Indique si la catégorie doit être affichée : Booléen (1 par défaut => actif)
+C'est-à-dire si vous souhaitez la rendre aussitôt disponible pour vos visiteurs.
+Par exemple, vous pourriez vouloir remettre à plus tard l'ouverture de la catégorie, tant que tous ses produits n'y ont pas été placés.|															
+			|Categories[<Id>].ParentID|		|Indique l' <Id> de la catégorie parente. Aucune par défaut.
+Utile pour créer une sous-catégorie appartenant à une catégorie autre que la "page d'accueil" (par défaut).|															
+			|Categories[<Id>].EstRacine|		|Indique s'il s'agit d'une nouvelle page d'accueil. Faux (0) par défaut. Utilie seulement en mode "Mono-Boutique".|															
+			|Categories[<Id>].Description|		|Description brève de la catégorie (html). |															
+			|Categories[<Id>].BaliseTitre|		|Le titre associée à la catégorie, destiné à apparaître dans les moteurs de recherche quand une recherche est faite par le client.|															
+			|Categories[<Id>].MotsCles|		|Liste de mots clés associés à la catégorie pour référencement par les moteurs de recherche.
+Les mots clés doivent être séparés par des espaces, et être mis entre guillements s'il comprenne des espaces (règle usuelle).|															
+			|Categories[<Id>].MetaDescr|		|Une présentation de la catégorie du catalogue/site en quelques lignes (HTML), dans le but d'attirer l'attention du client.
+Elle apparaîtra dans les résultats de recherche.|															
+			|Categories[<Id>].URLSimple|		|Cela vous permet de réécrire l'adresse web de vos catégories comme vous le souhaitez.
+Par exemple, au lieu d'avoir une adresse comme http://www.exemple.com/category.php?id_category=3, vous pouvez avoir http://www.exemple.com/123-nom-de-la-catégorie.
+Dans ce cas, vous devez simplement indiquer dans le champ "URL simplifiée" les mots (séparés par des tirets) que vous voudriez voir apparaître au lieu du "nom-de-la-catégorie".|															
+			|Categories[<Id>].URLImage|		|URL de l'image pour mettre en ligne une image représentative de la catégorie. Exemple : Logo de la catégorie.|															
+																				
+|Variables|		|Classe|	|Nom|	|Valeur|	|Comment|															
+		|Pragmas|			|Variables créées automatiquement par le programme, et disponibles partout dans le catalogue|															
+																				
+																				
+		|Common Variables|			|Variables générales définies par Mutiny|															
+			|Common.Stores|	|PPT  World|																
+			|Tailles.Adultes|	|XS S M L XL XXL 51 52|																
+			|Tailles.Enfants|	|2A 4A 6A 8A 10A 12A 14A|																
+			|Sexe|	|Homme Femme Enfants Girl-14 Boy-14|																
+			|S|	|H F E|																
+			|C|	|J V B R O|																
+			|T|	|XS S M L XL XXL|																
+			|Px1|	|1000|																
+			|Px2|	|2000|																
+			|Px3|	|3000|																
+		|Field Default Values|			|Mandatory fieds (marked *) will use these defaults if not set. An error will be generated otherwise within the analysis report.|															
+			|Collections.ID.Default|	|$(RN)|		|Expansé à l'utilisation|														
+			|Collections.Store.Default|	|$(Common.Stores)|																
+																				
+			|Categories.ID.Default|	|$(RN)|																
+			|Categories.EstActif.Default|	|$(ZERO)|																
+			|Categories.ParentID.Default|	|$(NIL)|																
+			|Categories.EstRacine.Default|	|$(ZERO)|																
+			|Categories.Description.Default|	|#(. $( "$(ROW).Nom" )   " "   ?(  $(  "$(ROW).ParentID"  )   $(  "$(SN)[$( "$(ROW).ParentID" )].Nom"  )  )  )|																
+																				
+			|Produits.Op.Default|	|CREA|																
+			|Produits.EAN13.Default|	|$(RN)|																
+																				
+																				
+|Collections|		|ID*|	|Nom*|	|Type*|	|Numero*|	|Store*|	|DateLancement*|													
+			|"Mutiny's Spirit"|	|1|	|1|		|20130101|													
+			|"Stand'Up"|	|5|	|1|		|20150401|													
+																				
+|Categories|		|ID*|	|Nom*|	|EstActif*|	|ParentID*|	|EstRacine*|	|Description*|	|BaliseTitre|	|MotcCles|	|MetaDescr|	|URLSimple|	|URLImage|								
+		|1|	|Nouveautés|	|1|																
+		|2|	|Essentiel|	|1|																
+		|3|	|Homme|	|1|																
+		|4|	|T-Shirt|	|1|	|3|															
+		|5|	|Polo|	|1|	|3|															
+		|6|	|Chemise|	|1|	|3|															
+		|7|	|SweatShirt|	|1|	|3|															
+		|8|	|Pull-Débardeur|	|1|	|3|															
+		|9|	|Short-Bermuda|	|1|	|3|															
+		|10|	|Pantalon|	|1|	|3|															
+		|11|	|"Vestes et Blousons"|	|1|	|3|															
+		|12|	|Sous-Vêtement|	|1|	|3|															
+		|13|	|Accessoire|	|1|	|3|															
+		|14|	|Femme|	|1|																
+		|15|	|T-Shirt|	|1|	|14|															
+		|16|	|Polo|	|1|	|14|															
+		|17|	|Chemise|	|1|	|14|															
+		|18|	|SweatShirt|	|1|	|14|															
+		|19|	|Pull-Débardeur|	|1|	|14|															
+		|20|	|Short-Bermuda|	|1|	|14|															
+		|21|	|Pantalon|	|1|	|14|															
+		|22|	|"Vestes et Blousons"|	|1|	|14|															
+		|23|	|Sous-Vêtement|	|1|	|14|															
+		|24|	|Accessoire|	|1|	|14|															
+		|25|	|Enfant|	|1|																
+		|26|	|Fille|	|1|	|25|															
+		|27|	|Garçon|	|1|	|25|															
+		|28|	|Outdoor|	|1|																
+		|29|	|Biking|	|1|	|28|															
+		|30|	|Exploration|	|1|	|28|															
+		|31|	|Rame|	|1|	|28|															
+		|32|	|Surf|	|1|	|28|															
+		|33|	|Voile|	|1|	|28|															
+		|34|	|Maison|	|1|																
+		|35|	|Déco|	|1|																
+|Proprietes|		|ID*|	|Nom*|	|OrdreEAN13|	|DigitsEAN13|	|Type|	|Valeurs|													
+		|MODC|	|Modèle|	|1|	|1|	|select|	|"Mutiny Vintage" Vespa Kalachnikov|													
+		|COLTS|	|"Col T-Shirt"|	|2|	|1|	|select|	|V Rond Ample|													
+		|CPOLO|	|"Col Polo"|	|2|	|1|	|select|	|Fin Large Brodé Lisière|													
+		|COLCH|	|"Col Chemise"|	|2|	|1|	|select|	|Fin Large Boutonné|													
+		|MANC|	|Manches|	|3|	|1|	|select|	|Marcel Courtes 3/4 Longues|													
+		|XTRA|	|"Extra Features"|	|3|	|1|	|select|	|Capuche "Dos Nageur" "Bretelles" "Ouverture Zippée" "Ouverture Boutons"|													
+																				
+																				
+		|COM|	|Composition|	|2|	|1|	|select|	|Coton Cuir Daim Elasthane Laine Paille Polyester Soie Viscose|													
+		|STY|	|Style|	|2|	|1|	|select|	|Casual  Classique Décontracté Habillé Girly Sport Surf Tendance Ville |													
+																				
+|Produits|	|Op*|	|Collection*|	|Nom*|	|Fabricant*|	|Fournisseur*|	|Categories*|	|Caracteristiques*|	|Declinaisons*|	|PrixHT*|	|Stock*|	|EAN13*|	|LxPxH|	|Poids*|	|Resume*|	|Description*|	|BaliseTitre|	|MotsCles|	|MetaDescr|	|URLSimple|	|URLImage*|
+		|Q( $(RN) )|	|"T=$(T) : C=$(C) : S=$(S)" |	|I( *(30 $(Px1)) *(30 $(Px2)) *(30 $(Px3)))|	|I(3 2 1)|															
+																				
+																				
+																				
+		| |																		

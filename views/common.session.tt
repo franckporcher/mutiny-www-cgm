@@ -1,0 +1,32 @@
+<div id="cgm-session">
+    <div id="cgm-login-container">
+        <form   id="cgm-login-form"
+                action="<% request.uri_base %>/cgm/login" 
+                method="POST"
+                autocomplete="on"
+                >
+            <fieldset>
+                <legend>Connexion</legend>
+                <label for="username">Identifiant</label>
+                <input  type="text"
+                        name="username"
+                        title="3 caractères au minimum, sans espace ;)"
+                        pattern="\S{3,}"
+                        list="userslist"
+                        required 
+                        autofocus />
+                <datalist id="userslist">
+                    <option value="Erik">
+                    <option value="Franck">
+                    <option value="Pierre">
+                    <option value="Guest">
+                </datalist>
+                <label for="password">Mot de passe</label>
+                <input  type="password" 
+                        name="password"
+                        title="8 caractères au minimum, sans espace ;)"
+                        />
+                <input type="submit" value="Se connecter">
+        </form>
+    </div>
+</div>

@@ -1,0 +1,106 @@
+[Franckys::CGM:3130] debug @2015-04-21 03:08:28> 
+    $VAR1 = bless({
+        _body_params    => {req => 'E=mc2'},
+        _chunk_size     => 4096,
+
+        _http_body      => bless({
+            body            => undef,
+            buffer          => '',
+            chunk_buffer    => '',
+            chunked         => '',
+            cleanup         => 1,
+            content_length  => '11',
+            content_type    => 'application/x-www-form-urlencoded; charset=UTF-8',
+            length          => 11,
+            param           => {},
+            param_order     => ['req'],
+            part_data       => {},
+            state           => 'done',
+            tmpdir          => '/var/folders/nv/grqz1j5d42792gtx8_f5vp_c0000z8/T',
+            upload          => {}
+        }, 'HTTP::Body::UrlEncoded' ),
+
+        _params         => {
+            req             => 'E=mc2',
+            splat           => ['1']
+        },
+        _preq           => bless({
+            env             => {
+                CONTENT_LENGTH          => '11',
+                CONTENT_TYPE            => 'application/x-www-form-urlencoded; charset=UTF-8',
+                HTTP_ACCEPT             => 'application/json, text/javascript, */*; q=0.01',
+                HTTP_ACCEPT_ENCODING    => 'gzip, deflate',
+                HTTP_ACCEPT_LANGUAGE    => 'fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3',
+                HTTP_CACHE_CONTROL      => 'no-cache',
+                HTTP_CONNECTION         => 'keep-alive',
+                HTTP_COOKIE             => 'style=blkbluw',
+                HTTP_HOST               => 'localhost:5000',
+                HTTP_PRAGMA             => 'no-cache',
+                HTTP_REFERER            => 'http://localhost:5000/cgm/muffinmc',
+                HTTP_USER_AGENT         => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:34.0) Gecko/20100101 Firefox/34.0',
+                HTTP_X_REQUESTED_WITH   => 'XMLHttpRequest',
+                PATH_INFO               => '/cgm/muffinmc/eval',
+                QUERY_STRING            => '',
+                REMOTE_ADDR             => '127.0.0.1',
+                REMOTE_PORT             => 55165,
+                REQUEST_METHOD          => 'POST',
+                REQUEST_URI             => '/cgm/muffinmc/eval',
+                SCRIPT_NAME             => '',
+                SERVER_NAME             => 0,
+                SERVER_PORT             => 5000,
+                SERVER_PROTOCOL         => 'HTTP/1.1',
+                'psgi.errors'           => *::STDERR,
+                'psgi.input'            => bless({'Stream::Buffered::PerlIO::$io'}, 'FileHandle' ),
+                'psgi.multiprocess'     => '',
+                'psgi.multithread'      => '',
+                'psgi.nonblocking'      => '',
+                'psgi.run_once'         => '',
+                'psgi.streaming'        => 1,
+                'psgi.url_scheme'       => 'http',
+                'psgi.version'          => [1,1],
+                'psgix.harakiri'        => 1,
+                'psgix.input.buffered'  => 1,
+                'psgix.io'              => bless( \*Symbol::GEN8, 'IO::Socket::INET' )
+            }
+        }, 'Plack::Request' ),
+
+        _query_params   => undef,
+        _read_position  => 11,
+        _route_params   => {splat => []},
+        body            => 'req=E%3Dmc2',
+        body_is_parsed  => 0,
+        data            => undef,
+        env             => {},
+
+        headers         => bless({
+            '::std_case'    => {
+                cookie              => 'COOKIE',
+                'x-requested-with'  => 'X-REQUESTED-WITH'
+            },
+            accept            => 'application/json, text/javascript, */*; q=0.01',
+            accept-encoding   => 'gzip, deflate',
+            accept-language   => 'fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3',
+            cache-control     => 'no-cache',
+            connection        => 'keep-alive',
+            content-length    => '11',
+            content-type      => 'application/x-www-form-urlencoded; charset=UTF-8',
+            cookie            => 'style=blkbluw',
+            host              => 'localhost:5000',
+            pragma            => 'no-cache',
+            referer           => 'http://localhost:5000/cgm/muffinmc',
+            user-agent        => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:34.0) Gecko/20100101 Firefox/34.0',
+            x-requested-with  => 'XMLHttpRequest'
+        }, 'HTTP::Headers' ),
+
+        id              => 2,
+        is_behind_proxy => 0,
+        path            => '/cgm/muffinmc/eval',
+        path_info       => '/cgm/muffinmc/eval',
+        uploads         => {},
+
+        vars            => {
+            time => 'Tue Apr 21 03:08:28 2015'
+        }
+
+    }, 'Dancer2::Core::Request' );
+

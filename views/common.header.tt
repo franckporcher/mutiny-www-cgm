@@ -1,0 +1,21 @@
+<div id="cgm-header">
+    <div class="container">
+        <div class="header1 left btext title">
+            <span>Catalogue Général Mutiny</span>
+        </div>
+        <div class="header1 left separator"></div>
+        <div class="header1 left btext subtitle">
+            <span><% app.title %></span>
+        </div>
+        <div id="cgm-header-session-container">
+            <div id="cgm-header-close-session-container">
+                <button id="cgm-header-close-session-button" type="button">Déconnexion</button>
+            </div>
+            <div id="cgm-header-session-user"><% localdata.user %></div>
+            <div id="cgm-header-session-time"><% localdata.time %></div>
+        </div>
+        <div id="cgm-loading-widget"><img src="<% request.uri_base %>/images/ajax-loader.gif" height="31" width="31" alt="loading..." /></div>
+    </div>
+</div>
+
+<div id="flash-container"><span id="flash" class="<%localdata.flash_class%>"><% localdata.flash %></span></div>

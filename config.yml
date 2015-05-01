@@ -1,0 +1,63 @@
+# This is the main configuration file of your Dancer2 app
+# env-related settings should go to environments/$env.yml
+# all the settings in this file will be loaded at Dancer's startup.
+
+# Your application's name
+appname: "cgm"
+
+# The environment
+environment: "development"
+# "production"
+
+# The default layout to use for your application (located in
+# views/layouts/main.tt)
+#layout: "main"
+layout: "main"
+
+# when the charset is set to UTF-8 Dancer2 will handle for you
+# all the magic of encoding and decoding. You should not care
+# about unicode within your app when this setting is set (recommended).
+charset: "UTF-8"
+
+#
+# No auto page
+#
+auto_page: 0
+
+#
+# Engine
+#
+template: "template_toolkit"
+session: "YAML"
+#session: "JSON"
+#session: "Sereal"
+engines:
+    session:
+        YAML:
+            session_dir: "/tmp/dancer-sessions"
+        JSON:
+            session_dir: "/tmp/dancer-sessions"
+        Sereal:
+            session_dir: "/tmp/dancer-sessions"
+    template:
+        template_toolkit:
+            ENCODING:       utf8
+            start_tag:      '<%'
+            end_tag:        '%>'
+            COMPILE_DIR:    './cache'
+            COMPILE_EXT:    '.ttc'
+            # DO NOT INTERPOLATE, BREAKS $("#id"). jQuery staff !
+            INTERPOLATE:    0
+            EVAL_PERL:      1
+            RECURSION:      1
+            TRIM:           1
+            VARIABLES:
+                MUTINY:     'MUTINY Tahiti - Island lovers unite'
+                FPO:        'Franck PORCHER'
+
+#
+# Dancer Plugins
+#
+plugins:
+    Ajax:
+        content_type: 'application/json'

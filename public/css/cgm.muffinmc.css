@@ -1,0 +1,547 @@
+/*
+ * MUFFINMC CONSOLE style sheet
+ *
+ * Project : TAHITI Mutiny
+ *
+ * Common & Global styles are defined in "cgm.common.css"
+ * 
+ * Copyright(C) 2015 - Franckys.com
+ * All rights reserved
+ */
+
+/* 
+ *=================
+ * MUFFINMC CONSOLE
+ *=================
+ */
+#muffinmc   {
+    position:           relative;
+    display:            block;
+    margin:             0;
+    border:             0;
+    height:             auto;
+    width:              100%;
+}
+
+
+/*
+ * MUFFINMC DISPLAY RESULTS PANEL
+ *
+ * CSS classes to be defined
+ *  . MC                        (main CSS class)
+ *  . MC-line                   (pour chaque ligne <tr>...</tr> affichée dans la console
+ *  . MC-blob-num               (<td> numéro de la ligne</td>)
+ *  [ MC-blob-type-<xxx> ]      TYPE DE LA LIGNE
+ *      . MC-blob-type-code     (<td> pour signifier type de la ligne = CODE</td>)
+ *      . MC-blob-type-res      (<td> pour signifier type de la ligne = RESULTAT</td>)
+ *      . MC-blob-type-err      (<td> pour signifier type de la ligne = ERREUR</td>)
+ *  [ MC-blob-line-code ]       DATA DE LA LIGNE
+ *      . MC-blob-line-code     (<td> CODE </td>)
+ *      . MC-blob-line-res      (<td> RESULTAT </td>)
+ *      . MC-blob-line-err      (<td> ERR </td>)
+ *   . MC-blob-space            (<td spacer></td>)
+ *   . MC-blob-footer           (<td>clickable widgets</td>)
+ *
+ */
+#muffinmc-display    {
+    position:           relative;
+    display:            block;
+    height:             auto;
+    border:             0;
+}
+
+/* ... x 44 */
+#muffinmc-display-header {
+    position:           relative;
+    display:            block;
+    margin:             0;
+    padding:            5px 0;
+    border:             1px solid #e5e5e5;
+    border-radius:      4px 4px 0 0;
+    height:             32px;
+    background-color:   #f9f9f9;
+}
+
+/* ... x 32 */
+#muffinmc-display-header-commands {
+    position:           relative;
+    float:              right;
+    margin:             4px 20px;
+    padding:            0;
+    border:             1px solid #e5e5e5;
+    border-radius:      4px 4px 4px 4px;
+    height:             22px;
+    font-size:          12px;
+    display:            table;
+}
+
+/* CMD BUTTONS ... x 22 */
+#muffinmc_reset_repl, #muffinmc_get_repl_selection {
+    display:        table-cell;
+    height:         100%;
+    padding:        0 10px; 
+    vertical-align: middle;
+    opacity:        0.5;
+}
+#muffinmc_reset_repl {
+    border: 0;
+    border-left: 1px solid #e5e5e5;
+}
+#muffinmc_get_repl_selection {
+    display: none;
+}
+
+#muffinmc_reset_repl.enabled, #muffinmc_get_repl_selection.enabled {
+    background-color:   rgba(65, 131, 196, 0.7);
+    color:              white;
+    cursor:             pointer;
+    opacity:            1;
+}
+#muffinmc_reset_repl.enabled:hover, #muffinmc_get_repl_selection.enabled:hover {
+    background-color:   rgba(65, 131, 196, 1);
+}
+
+
+/* REPL Container */
+#muffinmc-repl-container  {
+    position:           relative;
+    display:            block;
+	margin:             0;
+	padding:            0;
+    border:             1px solid #e5e5e5;
+    border-top:         0;
+    border-radius:      0 0 4px 4px;
+    height:             399px;
+    background-color:   #fefefe;
+    overflow:           auto;
+}
+
+#muffinmc-repl-table, #muffinmc-repl-tbody {
+    position:   relative;
+    width:      100%;
+}
+
+/*
+#muffinmc-repl-table, #muffinmc-repl-tbody {
+    width:    100%;
+    margin:   0;
+    padding:  0;
+    border:   0;
+    overflow: visible;
+}
+
+#muffinmc-repl-table tr {
+    margin:    0;
+    padding:   0;
+    border:    0;
+    width:     1278px;
+    overflow:  visible;
+}
+
+#muffinmc-repl-table td {
+    max-width: 0;
+    overflow: hidden;
+}
+*/
+
+/* MAIN CSS */
+.MC {
+    font-family:    "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", Courier, monospace;
+    font-size:      12px;
+    line-height:    18px;
+    min-height:     18px;
+    white-space:    pre-wrap;
+    word-wrap:      normal;
+}
+
+/**
+ * REPL LINE <tr> - 
+ * 978 x 18
+ */
+.MC.line {
+    cursor:         pointer;
+}
+
+.MC.line:hover, .MC.line.selected:hover, .MC.line.folded.firstline:hover {
+    background-color: rgba(199, 227, 255, 0.5);
+}
+.MC.line.selected {
+    background-color: rgba(255, 165, 0, 0.15);   /* orange; rgba(248, 238, 199, 0.5); */
+}
+
+.MC.line.folded.firstline {
+    background-color: rgba(255, 165, 0, 0.15);   /* orange; rgba(248, 238, 199, 0.5); */
+}
+.MC.line.folded:not(.firstline) {
+    display: none;
+}
+
+
+/**
+ * REPL LINE <td Colonne:1> - LINE NUMBER  (<MAIN>-blob-num)
+ * 50 x 18 
+ */
+.MC.blob-num {
+    width:          29px;
+    padding-left:   10px;
+    padding-right:  10px;
+    border:         0;
+    border-right:   1px solid #eee;
+    text-align:     right;
+    color:          rgba(0, 0, 0, 0.3);
+}
+
+
+/**
+ * REPL LINE <td Colonne:2 - LINE TYPE  (<MAIN>-blob-type-<code|res|err>)
+ * 50 x 18 
+ */
+.MC.blob-type-code  {
+    width:          15px;
+    margin:         0;
+    padding:        0;
+    border:         0;
+    color:          rgba(64, 64, 64, 0.5);
+}
+.MC.blob-type-code:before {content: "?";}
+
+.MC.blob-type-res  {
+    width:          15px;
+    margin:         0;
+    padding:        0;
+    border:         0;
+    color:          rgba(65, 131, 196, 1);
+}
+.MC.blob-type-res:before {content: "➔";}
+
+.MC.blob-type-err  {
+    width:          15px;
+    margin:         0;
+    padding:        0;
+    border:         0;
+    color:          rgba(255, 165, 0, 1);   /* orange; */
+    font-style:     oblique;
+}
+.MC.blob-type-err:before {content: "!";}
+
+
+/**
+ * REPL LINE <td Colonne:3 - LINE DATA  (<CSSMAIN>-blob-line-<code|res|err>)
+ * 868 x 18
+ */
+.MC.blob-line-code {
+    margin:         0;
+    padding:        0;
+    color:          rgba(64, 64, 64, 1.0);
+    border:         0;
+    border-top:     1px solid #f9f9f9;
+    font-family:    "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", Courier, monospace;
+}
+td.MC.blob-line-code:first-of-type {
+    border-top:     0;
+}
+
+.MC.blob-line-res {
+    margin:         0;
+    padding:        0;
+    border:         0;
+    font-size:      12px;
+    color:          rgba(65, 131, 196, 1);
+}
+
+.MC.blob-line-err {
+    margin:         0;
+    padding:        0;
+    border:         0;
+    color:          rgba(255, 165, 0, 1);   /* orange; */
+    font-family:    Palatino, "New York", Georgia,  "Times New Roman", serif;
+    font-style:     oblique;
+    font-size:      10px;
+}
+
+
+/**
+ * REPL LINE <td Colonne:4 - LINE SPACER  (<CSSMAIN>-blob-space)
+ * 50 x 18 
+ */
+.MC.blob-space  {
+    width:          10px;
+    margin:         0;
+    padding:        0;
+    border:         0;
+    color:          transparent;
+}
+
+
+/**
+ * REPL LINE <td Colonne:5 - LINE FOOTER (<CSSMAIN>-blob-footer)
+ * 50 x 18 
+ */
+.MC.blob-footer {
+    width:          29px;
+    padding-left:   10px;
+    padding-right:  10px;
+    border:         0;
+    border-left:    1px solid #eee;
+    text-align:     center;
+    color:          rgba(0, 0, 0, 0.3);
+}
+.MC.blob-footer:hover {
+    color:          rgba(0, 0, 0, 0.5);
+}
+
+
+/*
+ * SYNTACTIC COLORIZATION - SCC CLass: .SC
+ *
+ * . string
+ * . defvar
+ * . getval
+ * . deflist
+ * . listval
+ * . func
+ * . cond
+ * . multseq
+ * . iterator
+ * . lazy
+ * . qquote
+ * . warning
+ * . quote
+ * . evalmeta
+ * . progn
+ * . prog1
+ * . literal
+ *
+ */
+.MC.SC           {
+    font-size:      13px;
+    font-weight:    normal;
+}
+.MC.SC.literal  {          
+    font-size:      13px;
+    font-weight:    normal;
+}
+
+/*
+ * Litéraux
+ */
+.MC.SC.tt_literal               { 
+    /*
+     - Uncomment to set the color,
+     - Comment to let inherit from the parent macro 
+    color: rgb(144, 144, 144);
+    */
+    font-weight:    normal;
+}
+
+.MC.SC.tt_literal_inherit    { 
+    font-weight:    bold;
+}
+
+.MC.SC.tt_literal.literal_string    { 
+    /*
+     - Uncomment to set the color,
+     - Comment to let inherit from the parent macro 
+     color: rgb(212,   0, 212);
+    */
+    font-weight:    normal;
+}
+
+.MC.SC.tt_literal.literal_var       { 
+    /*
+     - Uncomment to set the color,
+     - Comment to let inherit from the parent macro 
+    color:          rgb(  0, 96,  255);
+    */
+    font-weight:    bold;
+}
+
+.MC.SC.tt_literal.literal_func      { 
+    /*
+     - Uncomment to set the color,
+     - Comment to let inherit from the parent macro 
+    color:          rgb(255,  64,  64);
+    */
+    font-weight:    bold;
+}
+
+/*
+ * Macros
+ */
+.MC.SC.tt_defvar    { 
+    color: rgb(  0, 96,  255);
+    font-weight:    normal;
+}
+.MC.SC.tt_getval, .MC.SC.tt_splitval    { 
+    color: rgb(  0, 188, 255);
+    font-weight:    normal;
+}
+.MC.SC.tt_deflist   { 
+    color: rgb(  0, 192,   0);
+    font-weight:    normal;
+}
+.MC.SC.tt_listval   { 
+    color: rgb(  0, 228,  55);
+    font-weight:    normal;
+}
+.MC.SC.tt_multseq   { 
+    color: rgb(185, 230,  38);
+    font-weight:    normal;
+}
+.MC.SC.tt_string    { 
+    color: rgb(255,  64,  64);
+    font-weight:    normal;
+}
+.MC.SC.tt_iterator  { 
+    color: rgb(160,   0, 255);
+    font-weight:    normal;
+}
+.MC.SC.tt_progn     { 
+    color: rgb(200,  42,  19);
+    font-weight:    normal;
+}
+.MC.SC.tt_prog1     { 
+    color: rgb(250, 128,  34);
+    font-weight:    normal;
+}
+.MC.SC.tt_evalmeta  { 
+    color: rgb(212,   0,   0);
+    font-weight:    normal;
+}
+.MC.SC.tt_func      { 
+    color: rgb(212,   0, 212);
+    font-weight:    normal;
+}
+.MC.SC.tt_qquote    { 
+    color: rgb(255,  96, 255);
+    font-weight:    normal;
+}
+.MC.SC.tt_cond      { 
+    color: rgb(200, 155,  29);
+    font-weight:    normal;
+}
+.MC.SC.tt_warning   { 
+    color: rgb( 62,  97, 162);
+    font-weight:    normal;
+}
+.MC.SC.tt_lazy, .MC.SC.tt_quote     { 
+    color: rgb(153,   0, 152);
+    font-weight:    normal;
+}
+
+.MC.SC.tt_defvar:before    {content: "=(";}
+.MC.SC.tt_getval:before    {content: "$(";}
+.MC.SC.tt_splitval:before  {content: "S(";}
+.MC.SC.tt_deflist:before   {content: "L(";}
+.MC.SC.tt_listval:before   {content: "@(";}
+.MC.SC.tt_multseq:before   {content: "*(";}
+.MC.SC.tt_func:before      {content: "#(";}
+.MC.SC.tt_iterator:before  {content: "I(";}
+.MC.SC.tt_lazy:before      {content: "Q(";}
+.MC.SC.tt_progn:before     {content: "P(";}
+.MC.SC.tt_prog1:before     {content: "1(";}
+.MC.SC.tt_evalmeta:before  {content: "M(";}
+.MC.SC.tt_string:before    {content: '"'; }
+.MC.SC.tt_quote:before     {content: "'(";}
+.MC.SC.tt_qquote:before    {content: '"(';}
+.MC.SC.tt_cond:before      {content: "?(";}
+.MC.SC.tt_warning:before   {content: "W(";}
+
+.MC.SC.tt_defvar:after     {content: ")"; }
+.MC.SC.tt_getval:after     {content: ")"; }
+.MC.SC.tt_splitval:after   {content: ")"; }
+.MC.SC.tt_deflist:after    {content: ")"; }
+.MC.SC.tt_listval:after    {content: ")"; }
+.MC.SC.tt_multseq:after    {content: ")"; }
+.MC.SC.tt_func:after       {content: ")"; }
+.MC.SC.tt_iterator:after   {content: ")"; }
+.MC.SC.tt_lazy:after       {content: ")"; }
+.MC.SC.tt_progn:after      {content: ")"; }
+.MC.SC.tt_prog1:after      {content: ")"; }
+.MC.SC.tt_evalmeta:after   {content: ")"; }
+.MC.SC.tt_string:after     {content: '"'; }
+.MC.SC.tt_quote:after      {content: ")"; }
+.MC.SC.tt_qquote:after     {content: ")"; }
+.MC.SC.tt_cond:after       {content: ")"; }
+.MC.SC.tt_warning:after    {content: ")"; }
+
+
+#muffinmc-logs  {
+}
+
+
+/*
+ * MUFFINMC CONSOLE INPUT
+ */
+#muffinmc-input    {
+    position:           relative;
+    display:            block;
+    margin:             5px 0 0 0;
+    padding:            10px;
+    height:             106px;
+    border:             2px solid rgba(0, 0, 0, 0.75);
+    border-radius:      4px 4px 4px 4px;
+    background-color:   rgba(65, 131, 196, 1);
+    overflow:           hidden;
+}
+
+/* 50 px X 14 px */
+#muffinmc-clear-input,  #muffinmc-demo {
+    position:           absolute;
+    display:            block;
+    top:                0;
+    margin:             0;
+    padding:            0 10px;
+    width:              28px;
+    height:             12px;       /* parent's padding-top + a shouia  */
+    border:             1px solid rgba(255,255,255,1);
+    border-radius:      4px 4px 4px 4px;
+    color:              rgba(255,255,255,1);
+    font-size:          10px;
+    vertical-align:     top;
+    cursor:             pointer;
+    opacity:            0.35;
+}
+#muffinmc-demo {
+    left:               calc(50% - 55px);
+}
+#muffinmc-clear-input {
+    left:               calc(50% +  5px);
+}
+
+#muffinmc-clear-input:hover, #muffinmc-demo:hover {
+    opacity:            0.9;
+}
+
+#muffinmc-input > form  {
+    width:      100%;
+    height:     100%; 
+    padding:    0;
+    margin:     0;
+    border:     0;
+}
+
+#muffinmc-repl-input {
+    width:      100%;
+    height:     100%; 
+    padding:    0;
+    margin:     0;
+    border:     0;
+    outline:    none;   /* 0px none transparent; */
+    background-color:   transparent;
+    font-size:  15px;
+    color:      white; 
+    overflow:   auto;
+    box-shadow: none;
+    /* -moz-appearance:    none; */
+    -webkit-box-shadow: none;
+    -moz-box-shadow:    none;
+}
+
+#muffinmc-repl-input:focus {
+            outline: 0;
+}
+
+*:focus {
+    outline: 0;
+}

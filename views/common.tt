@@ -1,0 +1,8 @@
+<% INCLUDE "common.header.tt" %>
+<% INCLUDE $app.template_content %>
+<% INCLUDE "common.session.tt" %>
+<!-- DEBUG ZONE -->
+<% IF localdata.debug %>
+  <% INCLUDE "debug.tt" %>
+<% END %>
+<% INCLUDE "common.footer.tt" %>
