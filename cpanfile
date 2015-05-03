@@ -15,6 +15,7 @@ requires 'JSON'                         => '2.90';
 requires "Dancer2"                      => "0.159003";
 requires "Dancer2::Plugin::Ajax";
 requires "Digest::MD5";
+requires "Carp::Always";
 
 recommends "YAML"                       => "0";
 recommends "URL::Encode::XS"            => "0";
