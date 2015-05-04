@@ -1,0 +1,8 @@
+.cgm*
+Franckys/Error.pm
+Franckys/MuffinMC.pm
+Franckys/Trace.pm
+cpanfile
+cpanfile.snapshot
+runplack-operational.sh.conf
+carton.deploy.log

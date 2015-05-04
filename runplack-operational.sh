@@ -1,4 +1,14 @@
 #!/bin/bash
+#
+# runplack-operational.sh -- Lancement du serveur web Dancer/plack local
+# (proxied par Apache) pour servir CGM et MuffinMC
+#
+# PROJECT: MUTINY Tahiti's websites
+#
+# Copyright (C) 2014-2015 - Franck Porcher, Ph.D 
+# www.franckys.com
+# Tous droits réservés
+# All rights reserved
 
 cd "$(dirname "$0")"
 
