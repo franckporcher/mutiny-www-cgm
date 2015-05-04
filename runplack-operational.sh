@@ -2,13 +2,23 @@
 
 cd "$(dirname "$0")"
 
+##
+# LOAD ENV
+#
+local CONF="$(basename "$0").conf"
+if [ -e "${CONF}" ]
+then
+    source "${CONF}"
+fi
+
+PLACK_HOST="${PLACK_HOST:-127.0.0.1}"
+PLACK_PORT="${PLACK_PORT:-8080}"
+
 PLACK_MODULE_DIR="$(pwd)"
 PLENV_ROOT="${PLACK_MODULE_DIR}/env/plenv"
-PLACK_HOST='127.0.0.1'
-PLACK_PORT='8080'
 PLACK_APP='bin/app.psgi'
 
-export PLACk_MODULE_DIR PLENV_ROOT PLACK_HOST PLACK_PORT PLACK_APP
+export PLACK_HOST PLACK_PORT PLACk_MODULE_DIR PLENV_ROOT PLACK_APP
 
 env                             \
     PLENV_ROOT="$PLENV_ROOT"    \
