@@ -3,27 +3,27 @@
  <head>
   <meta http-equiv="Content-type" content="text/html; charset=<% settings.charset %>" />
     <title>Catalogue Général Mutiny</title>
-    <link rel="stylesheet" href="<% request.uri_base %>/css/cgm.common.css" />
-    <link rel="stylesheet" href="<% request.uri_base %>/css/cgm.cgm.css" />
+    <link rel="stylesheet" href="/cgm/css/cgm.common.css" />
+    <link rel="stylesheet" href="/cgm/css/cgm.cgm.css" />
 
    <!-- Grab jQuery from a CDN, fall back to local if necessary -->
     <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
     <script type="text/javascript">/* <![CDATA[ */
-     !window.jQuery && document.write('<script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery-1.11.2.min.js"><\/script>')
+     !window.jQuery && document.write('<script type="text/javascript" src="/cgm/javascripts/jquery-1.11.2.min.js"><\/script>')
 /* ]]> */</script>
 
    <!-- Grab jQuery-UI from a CDN, fall back to local if necessary -->
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript">/* <![CDATA[ */
-     !window.jQuery.ui && document.write('<script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery-ui-1.11.4.min.js"><\/script>')
+     !window.jQuery.ui && document.write('<script type="text/javascript" src="/cgm/javascripts/jquery-ui-1.11.4.min.js"><\/script>')
 /* ]]> */</script>
 
     <!-- www.franckys.com specialized libraries -->
-    <script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery.franckys.tools.js"></script>
-    <script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery.franckys.kbd.js"></script>
-    <script type="text/javascript" src="<% request.uri_base %>/javascripts/franckys.dump.js"></script>
-    <script type="text/javascript" src="<% request.uri_base %>/javascripts/franckys.cgm.common.js"></script>
-    <script type="text/javascript" src="<% request.uri_base %>/javascripts/franckys.cgm.cgm.js"></script>
+    <script type="text/javascript" src="/cgm/javascripts/jquery.franckys.tools.js"></script>
+    <script type="text/javascript" src="/cgm/javascripts/jquery.franckys.kbd.js"></script>
+    <script type="text/javascript" src="/cgm/javascripts/franckys.dump.js"></script>
+    <script type="text/javascript" src="/cgm/javascripts/franckys.cgm.common.js"></script>
+    <script type="text/javascript" src="/cgm/javascripts/franckys.cgm.cgm.js"></script>
 
     <script>
         ( function($){ 

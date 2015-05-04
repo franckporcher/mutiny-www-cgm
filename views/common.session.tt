@@ -1,7 +1,7 @@
 <div id="cgm-session">
     <div id="cgm-login-container">
         <form   id="cgm-login-form"
-                action="<% request.uri_base %>/cgm/login" 
+                action="/cgm/login" 
                 method="POST"
                 autocomplete="on"
                 >
@@ -26,7 +26,8 @@
                         name="password"
                         title="8 caractères au minimum, sans espace ;)"
                         />
-                <input type="submit" value="Se connecter">
+                <input type="submit" value="Se connecter" />
+            </fieldset>
         </form>
     </div>
 </div>

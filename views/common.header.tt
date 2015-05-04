@@ -14,7 +14,7 @@
             <div id="cgm-header-session-user"><% localdata.user %></div>
             <div id="cgm-header-session-time"><% localdata.time %></div>
         </div>
-        <div id="cgm-loading-widget"><img src="<% request.uri_base %>/images/ajax-loader.gif" height="31" width="31" alt="loading..." /></div>
+        <div id="cgm-loading-widget"><img src="/images/ajax-loader.gif" height="31" width="31" alt="loading..." /></div>
     </div>
 </div>
 
