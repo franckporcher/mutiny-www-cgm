@@ -5,14 +5,16 @@ cd "$(dirname "$0")"
 ##
 # LOAD ENV
 #
-local CONF="$(basename "$0").conf"
+CONF="$(basename "$0").conf"
 if [ -e "${CONF}" ]
 then
     source "${CONF}"
 fi
-
 PLACK_HOST="${PLACK_HOST:-127.0.0.1}"
 PLACK_PORT="${PLACK_PORT:-8080}"
+
+source env/dot.bashrc
+
 
 PLACK_MODULE_DIR="$(pwd)"
 PLENV_ROOT="${PLACK_MODULE_DIR}/env/plenv"
