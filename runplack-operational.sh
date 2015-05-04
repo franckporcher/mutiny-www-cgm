@@ -15,7 +15,6 @@ PLACK_PORT="${PLACK_PORT:-8080}"
 
 source env/dot.bashrc
 
-
 PLACK_MODULE_DIR="$(pwd)"
 PLENV_ROOT="${PLACK_MODULE_DIR}/env/plenv"
 PLACK_APP='bin/app.psgi'
