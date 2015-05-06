@@ -1,4 +1,8 @@
-.cgm*
+.cgm.config
+.cgm.install
+.cgm.midinstall
+.cgm.postinstall
+.cgm.submodules
 Franckys/Error.pm
 Franckys/MuffinMC.pm
 Franckys/Trace.pm
