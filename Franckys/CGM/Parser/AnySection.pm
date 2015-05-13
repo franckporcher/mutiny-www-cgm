@@ -69,8 +69,8 @@ const my $IS_TEMPLATE_FIELD_DEFAULT_FLAG     => 0;
 my %Regex = (
     leading_spaces          => qr|^[[:space:]]+|,
     trailing_spaces         => qr|[[:space:]]+$|,
-    is_mandatory_field      => qr/[\pL\pN][+]*[*][+*]*$/,
-    is_template_field       => qr/[\pL\pN][*]*[+][+*]*$/,
+    is_mandatory_field      => qr/[\pL\pN][+]?[*][+]?$/,
+    is_template_field       => qr/[\pL\pN][*]?[+][*]?$/,
     clean_header            => qr|[*+]+$|,
     empty_field             => qr|^[[:space:]]*$|,
 );
@@ -84,7 +84,7 @@ my $Section = bless {} => __PACKAGE__;
         Franckys::Error::def_error(DATA_MISSING    => 'Section:[%s] Colonne:[%d] - Le champ:[%s] est requis, mais sa valeur est absente.');
         Franckys::Error::def_error(EVAR            => 'Section:[%s] Colonne:[%d] - Variable indéfinie:[%s].');
         Franckys::Error::def_error(EFUNC           => 'Section:[%s] Colonne:[%d] - Evaluation fonctionnelle:[%s].');
-        Franckys::Error::def_error(EMATHS          => 'Section:[%s] Colonne:[%d] - Erreur arithmétique:[%s].');
+        Franckys::Error::def_error(EARG            => 'Argument manquant:[%s].');
     
         #--- MUFFINMC SPECIAL VARIABLES (AUTOMATICALLY UPDATED)
         __PACKAGE__->set_muffin_variable( 'SN'  => sub { [ $_[0]->name()              ] });  # Section Name 
@@ -276,10 +276,10 @@ sub has_error {
         ;
 }
 
-# my $Franckys::Error = $section->Error($err_tag, $param);
+# my $Franckys::Error = $section->set_error($err_tag, $param);
 #
 # /!\ Must return a Franckys::Error object that accepts as_string() method.
-sub Error {
+sub set_error {
     my ($self, $err_tag, $param) = @_;
 
     return $self->{error}->Error(
@@ -419,7 +419,7 @@ sub generate_records {
          $field_index, 
          $field_value, 
          $lazy_sub,
-         $generation_flag,
+         $is_template,
     );
 
     ##
@@ -438,8 +438,8 @@ sub generate_records {
 
                 # Check template generation status
                 # Field must be 'template enabled'
-                # and must bear moe than one value
-                $generation_flag
+                # and must bear more than one value
+                $is_template
                     ||= ( $self->is_template_field($field_index)
                           && @$field_value > 1
                 );
@@ -455,7 +455,7 @@ sub generate_records {
     my $nb_generated_records = 0;     # Number of final generated records for this row
 
     my @final_records 
-        = $generation_flag
+        = $is_template
           ? $self->template_based_cross_product_generation(@record_template) 
           : ( [@record_template] )
           ;
@@ -470,8 +470,8 @@ sub generate_records {
             $self->set_IFN($field_index);
 
             # Compute Lazy value or Iterator sequence next value
-            if ( $lazy_sub  = (    muffin_isa_lazy(     $record->[$field_index] )
-                                || muffin_isa_iterator( $record->[$field_index] )
+            if ( $lazy_sub  = (    Franckys::MuffinMC::muffin_isa_lazy(     $record->[$field_index] )
+                                || Franckys::MuffinMC::muffin_isa_iterator( $record->[$field_index] )
                        )
             ) {
                 $record->[$field_index] = $lazy_sub->();
@@ -576,7 +576,7 @@ sub compute_field_value {
                 # Record semantic error
                 $field_value
                     = [ 
-                        $self->Error(
+                        $self->set_error(
                             'DATA_MISSING',
                             $self->headers( $field_index ),
                         )->as_string()
@@ -588,10 +588,11 @@ sub compute_field_value {
         }
     }
 
-    ## At this stage, $field_value is set only after reaching a default
-    ## final value or an error.
+    ## At this stage, $field_value is set only after reaching a final default value or an error.
+    ## And that should be it.
+    ## Not set if muffin expression not evaluated yes
     
-    # Compute Field Value's pointfixe
+    # Compute Muffin Expression or not...
     if (! defined $field_value) {
         $field_value
             = $self->need_eval( $field_index )
@@ -600,19 +601,21 @@ sub compute_field_value {
     }
 
     traceout($field_value);
-    $field_value;
+    return $field_value;
 }
 
-# my $field_value = $section->EVAL( $field_index , $cell_string );
+# my $final = $section->EVAL( $field_index , $cell_string );
 # 
-# An arrary reference on a list of values, possibly reduced
+# An array reference on a list of values, possibly reduced
 # to a simple singleton.
 sub EVAL {
     my ($self, $field_index, $cell_string) = @_;
     tracein(ref($self), $field_index, $cell_string);
+
     my $v = muffin_eval( $cell_string, $self );
+
     traceout($v);
-    $v;
+    return $v;
 }
 
 # my $field_default_value | undef = $section->get_field_default_value( $field_index );
@@ -632,13 +635,13 @@ sub get_field_default_value {
         : undef;    # No default value
 
     traceout( $default );
-    $default;
+    return $default;
 }
 
-# my @field_values = $section->get_record_field_values( $record, $field_index );
-sub get_record_field_values {
+# my @field_values = $section->get_record_final_value( $record, $field_index );
+sub get_record_final_value {
     my ($self, $record, $field_index) = @_;
-    @{ $record->[$field_index] }
+    return $record->[$field_index];
 }
 
 # $section->chomp_spaces( $str );
@@ -649,7 +652,7 @@ sub chomp_spaces {
 
 # $bool = $self->is_field_empty( $field ) ;
 sub is_field_empty {
-    $_[1] =~ /$Regex{empty_field}/;
+    return $_[1] =~ /$Regex{empty_field}/;
 }
 
 
@@ -782,13 +785,13 @@ sub set_muffin_record_variable {
 # my $value = $section->set_muffin_variable($varname, $value);
 sub set_muffin_variable {
     my ($self, $varname, $value) = @_;
-    muffin_setvar($varname, $value);
+    return muffin_setvar($varname, $value);
 }
 
 # my values_ar = $section->get_muffin_variable($varname, $param...);
 sub get_muffin_variable {
     my ($self, $varname, @params) = @_;
-    muffin_getval($varname, $self, @params);
+    return muffin_getval($varname, $self, @params);
 }
 
 # my  $bool = $section->exists_muffin_variable($varname);
@@ -901,14 +904,15 @@ sub record_as_html {
     my ($self, $record) = @_;
 
     my @record_field_values = map {
-        my @values = $self->get_record_field_values($record, $_);
-          @values < 1             ? ''
-        : @values < 2             ? $values[0]
-        :                           "[ @values ]"
+        my $final = $self->get_record_final_value($record, $_);
+
+          $#$final == -1  ? ''
+        : $#$final == 0   ? $final->[0]
+        :                   sprintf('(%s)', (join ')(', @{$final}))
         ;
     } 0 .. (scalar(@$record) - 1);
-    local $" = '> <';
-    "<@record_field_values>";
+    local $" = '</span><span>';
+    "<span>@record_field_values</span>";
 }
 
 

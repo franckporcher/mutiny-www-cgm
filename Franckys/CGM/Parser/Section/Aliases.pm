@@ -1,6 +1,6 @@
 #===============================================================================
 #
-#         FILE: Franckys/CGM/Parser/Section/Variables.pm
+#         FILE: Franckys/CGM/Parser/Section/Aliases.pm
 #
 #        USAGE: <+USAGE+>
 #
@@ -21,7 +21,7 @@
 # www.franckys.com
 # Tous droits réservés - All rights reserved
 #===============================================================================
-package Franckys::CGM::Parser::Section::Variables;
+package Franckys::CGM::Parser::Section::Aliases;
 use version; our $VERSION = 'v0.11';           # Keep on same line
 use v5.20;                                      ## no critic (ValuesAndExpressions::ProhibitVersionStrings)
 use strict;
@@ -114,26 +114,42 @@ const my $VARVALUE_FIELDINDEX   => 4;
 
 # my $bool   = $section->need_eval( $field_index )
 
-##
-# True MuffinMC Variables.
-# Their definitions are evaled to produce final [...] values
-sub need_eval { 1 }
+# Les aliases sont des expression MuffinMC (string) NON EVALUEES
+# Pour évaluation lors d'utilisation ultérieure.
+sub need_eval { 0 }
 
 # my $record = $section->validate_record($record);
 sub validate_record {
     my ($self, $record) = @_;
 
     my ($varname) = @{ $self->get_record_final_value($record, $VARNAME_FIELDINDEX) };
+    my $final     = $self->get_record_final_value($record, $VARVALUE_FIELDINDEX);
 
     if ( $varname ) {
-        $self->set_muffin_variable(
-            $varname,
-            $self->get_record_final_value($record, $VARVALUE_FIELDINDEX),
-        );
+
+        if ( $#$final == -1 ) {
+            $self->set_muffin_variable(
+                $varname,
+                $record->[$VARVALUE_FIELDINDEX]
+                    = [ 
+                        $self->set_error(
+                            'DATA_MISSING',
+                            $self->headers( $VARVALUE_FIELDINDEX ),
+                        )->as_string()
+                    ]
+            );
+        }
+        else {
+            $self->set_muffin_variable(
+                $varname,
+                $final->[0], # An alias is not a [final] value but a string to be later evaluated
+            );
+        }
+
         return $record;
     }
     else {
-        return; # Ignore record
+        return; # Do not need record
     }
 }
 

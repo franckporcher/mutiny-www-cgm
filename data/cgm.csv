@@ -101,88 +101,116 @@ Dans ce cas, vous devez simplement indiquer dans le champ "URL simplifiée" les 
 			|Categories[<Id>].URLImage|		|URL de l'image pour mettre en ligne une image représentative de la catégorie. Exemple : Logo de la catégorie.|															
 																				
 |Variables|		|Classe|	|Nom|	|Valeur|	|Comment|															
-		|Pragmas|			|Variables créées automatiquement par le programme, et disponibles partout dans le catalogue|															
-																				
-																				
 		|Common Variables|			|Variables générales définies par Mutiny|															
 			|Common.Stores|	|PPT  World|																
-			|Tailles.Adultes|	|XS S M L XL XXL 51 52|																
-			|Tailles.Enfants|	|2A 4A 6A 8A 10A 12A 14A|																
-			|Sexe|	|Homme Femme Enfants Girl-14 Boy-14|																
-			|S|	|H F E|																
-			|C|	|J V B R O|																
-			|T|	|XS S M L XL XXL|																
-			|Px1|	|1000|																
-			|Px2|	|2000|																
-			|Px3|	|3000|																
-		|Field Default Values|			|Mandatory fieds (marked *) will use these defaults if not set. An error will be generated otherwise within the analysis report.|															
-			|Collections.ID.Default|	|$(RN)|		|Expansé à l'utilisation|														
-			|Collections.Store.Default|	|$(Common.Stores)|																
 																				
-			|Categories.ID.Default|	|$(RN)|																
+		|Field Default Values|			|Les champs obligatoires sont marqués par * dans l'entête de la colonne pour la section. Les champs non positionnés utiliseront les valeurs par défaut définies ci-dessous. |															
+			|Collections.Store.Default|	|$(Common.Stores)|																
+			|Collections.OrdreEAN13.Default|	|$(ZERO)|																
+			|Collections.DigitsEAN13.Default|	|3|																
 			|Categories.EstActif.Default|	|$(ZERO)|																
 			|Categories.ParentID.Default|	|$(NIL)|																
 			|Categories.EstRacine.Default|	|$(ZERO)|																
 			|Categories.Description.Default|	|#(. $( "$(ROW).Nom" )   " "   ?(  $(  "$(ROW).ParentID"  )   $(  "$(SN)[$( "$(ROW).ParentID" )].Nom"  )  )  )|																
-																				
+			|Categories.OrdreEAN13.Default|	|3|																
+			|Categories.DigitsEAN13.Default|	|3|																
+			|Attributs.Type.Default|	|select|																
 			|Produits.Op.Default|	|CREA|																
-			|Produits.EAN13.Default|	|$(RN)|																
+			|Produits.Nom.Default|	|NO NAME|		|Other values are : "color" et radio-buttons (what is the code for prestashop)|														
+			|Produits.Marque.Default|	|MUTINY TAHITI|																
+			|Produits.Fournisseur.Default|	|KOKOLO|																
+			|Produits.EAN13.Default|	|Q($(RN))|																
+																				
+|Aliases|		|Classe|	|Nom|	|Valeur|	|Comment|															
+		|Common Variables|			|Variables générales définies par Mutiny|															
+			|Common.Stores|	|PPT  World|																
+																				
+		|Field Default Values|			|Les champs obligatoires sont marqués par * dans l'entête de la colonne pour la section. Les champs non positionnés utiliseront les valeurs par défaut définies ci-dessous. |															
+			|Collections.Store.Default|	|$(Common.Stores)|																
+			|Collections.OrdreEAN13.Default|	|$(ZERO)|																
+			|Collections.DigitsEAN13.Default|	|3|																
 																				
 																				
-|Collections|		|ID*|	|Nom*|	|Type*|	|Numero*|	|Store*|	|DateLancement*|													
-			|"Mutiny's Spirit"|	|1|	|1|		|20130101|													
-			|"Stand'Up"|	|5|	|1|		|20150401|													
-																				
-|Categories|		|ID*|	|Nom*|	|EstActif*|	|ParentID*|	|EstRacine*|	|Description*|	|BaliseTitre|	|MotcCles|	|MetaDescr|	|URLSimple|	|URLImage|								
-		|1|	|Nouveautés|	|1|																
-		|2|	|Essentiel|	|1|																
-		|3|	|Homme|	|1|																
-		|4|	|T-Shirt|	|1|	|3|															
-		|5|	|Polo|	|1|	|3|															
-		|6|	|Chemise|	|1|	|3|															
-		|7|	|SweatShirt|	|1|	|3|															
-		|8|	|Pull-Débardeur|	|1|	|3|															
-		|9|	|Short-Bermuda|	|1|	|3|															
-		|10|	|Pantalon|	|1|	|3|															
-		|11|	|"Vestes et Blousons"|	|1|	|3|															
-		|12|	|Sous-Vêtement|	|1|	|3|															
-		|13|	|Accessoire|	|1|	|3|															
-		|14|	|Femme|	|1|																
-		|15|	|T-Shirt|	|1|	|14|															
-		|16|	|Polo|	|1|	|14|															
-		|17|	|Chemise|	|1|	|14|															
-		|18|	|SweatShirt|	|1|	|14|															
-		|19|	|Pull-Débardeur|	|1|	|14|															
-		|20|	|Short-Bermuda|	|1|	|14|															
-		|21|	|Pantalon|	|1|	|14|															
-		|22|	|"Vestes et Blousons"|	|1|	|14|															
-		|23|	|Sous-Vêtement|	|1|	|14|															
-		|24|	|Accessoire|	|1|	|14|															
-		|25|	|Enfant|	|1|																
-		|26|	|Fille|	|1|	|25|															
-		|27|	|Garçon|	|1|	|25|															
-		|28|	|Outdoor|	|1|																
-		|29|	|Biking|	|1|	|28|															
-		|30|	|Exploration|	|1|	|28|															
-		|31|	|Rame|	|1|	|28|															
-		|32|	|Surf|	|1|	|28|															
-		|33|	|Voile|	|1|	|28|															
-		|34|	|Maison|	|1|																
-		|35|	|Déco|	|1|																
-|Proprietes|		|ID*|	|Nom*|	|OrdreEAN13|	|DigitsEAN13|	|Type|	|Valeurs|													
-		|MODC|	|Modèle|	|1|	|1|	|select|	|"Mutiny Vintage" Vespa Kalachnikov|													
-		|COLTS|	|"Col T-Shirt"|	|2|	|1|	|select|	|V Rond Ample|													
-		|CPOLO|	|"Col Polo"|	|2|	|1|	|select|	|Fin Large Brodé Lisière|													
-		|COLCH|	|"Col Chemise"|	|2|	|1|	|select|	|Fin Large Boutonné|													
-		|MANC|	|Manches|	|3|	|1|	|select|	|Marcel Courtes 3/4 Longues|													
-		|XTRA|	|"Extra Features"|	|3|	|1|	|select|	|Capuche "Dos Nageur" "Bretelles" "Ouverture Zippée" "Ouverture Boutons"|													
 																				
 																				
-		|COM|	|Composition|	|2|	|1|	|select|	|Coton Cuir Daim Elasthane Laine Paille Polyester Soie Viscose|													
-		|STY|	|Style|	|2|	|1|	|select|	|Casual  Classique Décontracté Habillé Girly Sport Surf Tendance Ville |													
 																				
-|Produits|	|Op*|	|Collection*|	|Nom*|	|Fabricant*|	|Fournisseur*|	|Categories*|	|Caracteristiques*|	|Declinaisons*|	|PrixHT*|	|Stock*|	|EAN13*|	|LxPxH|	|Poids*|	|Resume*|	|Description*|	|BaliseTitre|	|MotsCles|	|MetaDescr|	|URLSimple|	|URLImage*|
-		|Q( $(RN) )|	|"T=$(T) : C=$(C) : S=$(S)" |	|I( *(30 $(Px1)) *(30 $(Px2)) *(30 $(Px3)))|	|I(3 2 1)|															
+																				
+																				
+|Collections|		|ID*|	|Nom*|	|Type*|	|Numero*|	|Store*|	|DateLancement*|	|OrdreEAN13*|	|DigitsEAN13*|											
+		|1|	|"Mutiny's Spirit"|	|1|	|1|		|20130101|													
+		|2|	|"Stand'Up"|	|5|	|1|		|20150401|													
+																				
+|Categories|		|ID*|	|Nom*|	|EstActif*|	|ParentID*|	|EstRacine*|	|Description*|	|OrdreEAN13*|	|DigitsEAN13*|	|BaliseTitre|	|MotcCles|	|MetaDescr|	|URLSimple|	|URLImage|						
+		|0|	|Nouveautés|	|1|																
+		|1|	|Essentiel|	|1|																
+		|2|	|Homme|	|1|																
+		|20|	|T-Shirt|	|1|	|2|															
+		|200|	|Classique|	|1|	|20|															
+		|201|	|Marcel Classique|	|1|	|20|															
+		|202|	|Marcel Col V|	|1|	|20|															
+		|203|	|Marcel Col brodé|	|1|	|20|															
+		|204|	|Manches 3/4 Col rond|	|1|	|20|															
+		|205|	|Manches 3/4 Col V|	|1|	|20|															
+		|206|	|Manches 3/4 Col brodé|	|1|	|20|															
+		|207|	|Manches Longues Col rond|	|1|	|20|															
+		|208|	|Manches longues Col V|	|1|	|20|															
+		|209|	|Manches longues Col brodé|	|1|	|20|															
+		|21|	|Polo|	|1|	|2|															
+		|22|	|Chemise|	|1|	|2|															
+		|220|	|Coupe droite Manches courtes|	|1|	|22|															
+		|221|	|Coupe droite Manches longues|	|1|	|22|															
+		|222|	|Coupe fit Manches courtes|	|1|	|22|															
+		|223|	|Coupe fit Manches longues|	|1|	|22|															
+		|224|	|Coupe droite Manches courtes
+Col brodé|	|1|	|22|															
+		|225|	|Coupe droite Manches longues
+Col brodé|	|1|	|22|															
+		|226|	|Coupe fit Manches courtes
+Col brodé|	|1|	|22|															
+		|227|	|Coupe fit Manches longues
+Col brodé|	|1|	|22|															
+		|23|	|SweatShirt|	|1|	|2|															
+		|24|	|Pull-Débardeur|	|1|	|2|															
+		|25|	|Short-Bermuda|	|1|	|2|															
+		|26|	|Pantalon|	|1|	|2|															
+		|27|	|"Vestes et Blousons"|	|1|	|2|															
+		|28|	|Sous-Vêtement|	|1|	|2|															
+		|29|	|Accessoire|	|1|	|2|															
+		|3|	|Femme|	|1|																
+		|30|	|T-Shirt|	|1|	|3|															
+		|31|	|Polo|	|1|	|3|															
+		|32|	|Chemise|	|1|	|3|															
+		|33|	|SweatShirt|	|1|	|3|															
+		|34|	|Pull-Débardeur|	|1|	|3|															
+		|35|	|Short-Bermuda|	|1|	|3|															
+		|36|	|Pantalon|	|1|	|3|															
+		|37|	|"Vestes et Blousons"|	|1|	|3|															
+		|38|	|Sous-Vêtement|	|1|	|3|															
+		|39|	|Accessoire|	|1|	|3|															
+		|4|	|Enfant|	|1|																
+		|40|	|Fille|	|1|	|4|															
+		|41|	|Garçon|	|1|	|4|															
+		|5|	|Outdoor|	|1|																
+		|50|	|Biking|	|1|	|5|															
+		|51|	|Exploration|	|1|	|5|															
+		|52|	|Rame|	|1|	|5|															
+		|53|	|Surf|	|1|	|5|															
+		|54|	|Voile|	|1|	|5|															
+		|6|	|Maison|	|1|																
+		|7|	|Déco|	|1|																
+|Attributs|		|ID*|	|Code*|	|Nom*|	|OrdreEAN13*|	|DigitsEAN13*|	|Type*|	|Valeurs*|												
+		|1|	|MODEL|	|Modèle|	|6|	|1|	|select|	|"Mutiny Vintage" Vespa Kalachnikov|												
+		|2|	|XTRA|	|Extra Features|	|7|	|1|	|select|	|Capuche "Dos Nageur" "Bretelles" "Ouverture Zippée" "Ouverture Boutons" "Maille piquée"|												
+		|3|	|FAB|	|Composition|	|8|	|1|	|select|	|Coton Cuir Daim Elasthane Laine Paille Polyester Soie Viscose|												
+		|4|	|TH|	|Taille Homme|	|9|	|1|	|select|	|XS S M L XL XXL 52 54 56 58|												
+		|5|	|TF|	|Taille Femme|	|9|	|1|	|select|	|XS S M L XL XXL 52 54 56 58|												
+		|6|	|TE|	|Taille Enfant|	|9|	|1|	|select|	|1A 2A 3A 4A 5A 6A 8A 10A 12A 14A|												
+		|7|	|CT|	|Couleur / Texture|	|10|	|2|	|select|	|FAKE "HEATHER TAN" "HEATHER NAVY" "HEATHER BROWN" "DEEP HEATHER" BROWN NAVY OLIVE ASPHALTE MIDNIGHT "LIGHT BLUE/GREY" BROWN/TAN "CANVAS RED/GREY" KHAKI "SKY BLUE" PURPLE "DARK GREY" "USED VIOLET" "SPORT GREY" SAND "USED RASPBERRY"|												
+																				
+																				
+																				
+|Produits|	|Op*|	|CollectionID*|	|CategorieID*+|	|AttributsFIxes|	|AttributsDeclinaisons+|	|Nom*|	|Marque*|	|Fournisseur*|	|PrixHT*|	|Stock*|	|EAN13*|	|LxPxH|	|Poids*|	|Resume*|	|Description*|	|BaliseTitre|	|MotsCles|	|MetaDescr|	|URLSimple|	|URLImage*|
+		|NA|	|201 202 203|	|NA|	|"A(MODEL= 1 2 3)  A(XTRA= "1 2"  3   "4 5")  A(TH= 3 4 5)   A(CT= 1 3 4 5 6)"|	|NA|	|NA|	|NA|	|NA|	|NA|	|NA|		|NA|	|NA|	|NA|					|NA|
 																				
 																				
 																				

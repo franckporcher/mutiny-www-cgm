@@ -312,6 +312,7 @@ td.MC.blob-line-code:first-of-type {
  * . prog1
  * . literal
  *
+ * . associer
  */
 .MC.SC           {
     font-size:      13px;
@@ -377,11 +378,15 @@ td.MC.blob-line-code:first-of-type {
     font-weight:    normal;
 }
 .MC.SC.tt_deflist   { 
-    color: rgb(  0, 192,   0);
+    color: rgb(  0, 180,   0);
     font-weight:    normal;
 }
 .MC.SC.tt_listval   { 
     color: rgb(  0, 228,  55);
+    font-weight:    normal;
+}
+.MC.SC.tt_associer   { 
+    color: rgb(  0, 132,   0);
     font-weight:    normal;
 }
 .MC.SC.tt_multseq   { 
@@ -411,6 +416,11 @@ td.MC.blob-line-code:first-of-type {
 .MC.SC.tt_func      { 
     color: rgb(212,   0, 212);
     font-weight:    normal;
+}
+.MC.SC.tt_pragma      { 
+    color: rgb(128,   0, 128);
+    font-weight:    normal;
+    font-style:     italic;
 }
 .MC.SC.tt_qquote    { 
     color: rgb(255,  96, 255);
@@ -446,6 +456,8 @@ td.MC.blob-line-code:first-of-type {
 .MC.SC.tt_qquote:before    {content: '"(';}
 .MC.SC.tt_cond:before      {content: "?(";}
 .MC.SC.tt_warning:before   {content: "W(";}
+.MC.SC.tt_associer:before  {content: "A(";}
+.MC.SC.tt_pragma:before    {content: "!("; }
 
 .MC.SC.tt_defvar:after     {content: ")"; }
 .MC.SC.tt_getval:after     {content: ")"; }
@@ -464,6 +476,8 @@ td.MC.blob-line-code:first-of-type {
 .MC.SC.tt_qquote:after     {content: ")"; }
 .MC.SC.tt_cond:after       {content: ")"; }
 .MC.SC.tt_warning:after    {content: ")"; }
+.MC.SC.tt_associer:after   {content: ")"; }
+.MC.SC.tt_pragma:after     {content: ")"; }
 
 
 #muffinmc-logs  {

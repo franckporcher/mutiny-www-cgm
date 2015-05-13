@@ -10,3 +10,8 @@ cpanfile
 cpanfile.snapshot
 runplack-operational.sh.conf
 carton.deploy.log
+cache
+env
+local
+vendor
+.DS_Store

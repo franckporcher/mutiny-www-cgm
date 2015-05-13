@@ -1,11 +1,11 @@
 #!/usr/bin/env perl 
 #===============================================================================
 #
-#         FILE: <+FILENAME+>
+#         FILE: cgm.pl
 #
-#        USAGE: <+USAGE+>
+#        USAGE: cgm.pl OPTIONS
 #
-#  DESCRIPTION: <+DESCRIPTION+>
+#  DESCRIPTION: Main entry into MUTINY Tahiti's project CGM module
 #
 #      OPTIONS: <+OPTIONS+>
 # REQUIREMENTS: <+REQUIREMENTS+>
@@ -17,37 +17,37 @@
 #      CREATED: Mer 18 fév 2015 18:07:33 PST
 #     REVISION: <+REVISION+>
 #
-# Copyright (C) 1995-2015 - Franck Porcher, Ph.D 
+# Copyright (C) 2014-2015 - Franck Porcher, Ph.D 
 # www.franckys.com
 # Tous droits réservés - All rights reserved
 #===============================================================================
 package main;
-use version; our $VERSION = 'v0.11';           # Keep on same line
-use v5.20;                                      ## no critic (ValuesAndExpressions::ProhibitVersionStrings)
+use version; our $VERSION = 'v0.11';                # Keep on same line
+use v5.20;                                          ## no critic (ValuesAndExpressions::ProhibitVersionStrings)
 use strict;
 use warnings;
 use autodie;
 use feature             qw( switch say unicode_strings );
-use local::lib          './local';
-
+use FindBin;
+use lib "$FindBin::Bin/../local/lib/perl5";
+use lib "$FindBin::Bin/../lib";
 use Carp                qw( carp croak confess cluck );
 use Const::Fast;
 use Pod::Usage;
 use File::Basename      qw( basename );
 use Getopt::Long;
-Getopt::Long::Configure('bundling');            # Allow bundling of 1-char option "A la Unix"
-    $0 = basename($0);                        # shorter messages
-use Try::Tiny;          # try {...} catch { carp "got a die: $_} finally { always_done_and_suppresses_errors }
-
-## Optional Modules
+Getopt::Long::Configure('bundling');                # Allow bundling of 1-char option "A la Unix"
+    $0 = basename($0);                              # shorter messages
+use Try::Tiny;                                      # try {...} catch { carp "got a die: $_} finally { always_done_and_suppresses_errors }
 # use File::Copy
 # use Scalar::Util;
 # use Regexp::Common;
 # use Path::Class
-
+#use Carp::Always;
 use Franckys::Trace;
 use Franckys::Error;
 use Franckys::CGM::Parser;
+
 
 #----------------------------------------------------------------------------
 # UTF8 STUFF
@@ -59,6 +59,7 @@ use Encode              qw( encode decode );
 use Unicode::Collate;
 use Unicode::Normalize  qw( NFD NFC );
     #$_=NFD(chomp(readline()));  say NFC($_);
+
 
 #----------------------------------------------------------------------------
 # I/O
@@ -72,6 +73,7 @@ END { close STDOUT }
 if (grep /\P{ASCII}/ => @ARGV) { 
        @ARGV = map { decode("UTF-8", $_) } @ARGV;
 }
+
 
 #----------------------------------------------------------------------------
 # EXCEPTION HANDLING
@@ -124,6 +126,7 @@ sub ipc_die {
     confess $msg;
 }
 
+
 #----------------------------------------------------------------------------
 # OPTIONS HANDLING -- option recipients & handlers go here
 #----------------------------------------------------------------------------
@@ -136,6 +139,7 @@ my %option = (
     #   n_str   => [],
     #   rgb     => [],
     #   define  => {},
+    file        => '',
 );
 
 GetOptions(
@@ -150,20 +154,21 @@ GetOptions(
             trace_off();
         }
     },
+    'f|file=s'      => \$option{file},
     #
     # REMINDER ;-)
     #
-    #   'flag'          => $opt{ flag   },     # --flag (boolean)
-    #   'flag!'         => $opt{ flag   },     # --flag | --noflag                 (boolean)
-    #   'inum=i'        => $opt{ inum   },     # --inum=2                          (integral)
-    #   'fnum=f'        => $opt{ fnum   },     # --fnum=3.14                       (float)
-    #   'str=s'         => $opt{ str    },     # --str hello                       (string)
-    #   'incr+'         => $opt{ incr   },     # --incr --incr ...                 (integral)
-    #   'n_str=s@'      =>  { n_str  },     # --n_str hello --n_str world ...   (string)
-    #   'n_str=s{2}'    =>  { n_str  },     # --n_str hello world ...           (string)
-    #   'rgb=i@'        =>  { rgb    },     # --rgb 100 --rgb 100 --rgb 255     (integral+)
-    #   'rgb=i{3}'      =>  { rgb    },     # --rgb 100 100 255                 (integral x 3)
-    #   'define=s%'     =>  { define },     # --define key=value ...            (hash)
+    #   'flag'          => $opt{ flag   },      # --flag (boolean)
+    #   'flag!'         => $opt{ flag   },      # --flag | --noflag                 (boolean)
+    #   'inum=i'        => $opt{ inum   },      # --inum=2                          (integral)
+    #   'fnum=f'        => $opt{ fnum   },      # --fnum=3.14                       (float)
+    #   'str=s'         => $opt{ str    },      # --str hello                       (string)
+    #   'incr+'         => $opt{ incr   },      # --incr --incr ...                 (integral)
+    #   'n_str=s@'      =>  { n_str  },         # --n_str hello --n_str world ...   (string)
+    #   'n_str=s{2}'    =>  { n_str  },         # --n_str hello world ...           (string)
+    #   'rgb=i@'        =>  { rgb    },         # --rgb 100 --rgb 100 --rgb 255     (integral+)
+    #   'rgb=i{3}'      =>  { rgb    },         # --rgb 100 100 255                 (integral x 3)
+    #   'define=s%'     =>  { define },         # --define key=value ...            (hash)
 ) or pod2usage(1);
 
 #----------------------------------------------------------------------------
@@ -180,10 +185,15 @@ GetOptions(
 main( @ARGV );
 sub main {
     try {
-        my $parser = Franckys::CGM::Parser->new('./cgm.csv');
-        Franckys::Error::die_if_err($parser);
-        $parser->parse_file();
-        $parser->dump();
+        if ($option{file}) {
+            my $parser = Franckys::CGM::Parser->new( $option{file} );
+            Franckys::Error::die_if_error($parser);
+            $parser->parse_file();
+            $parser->dump();
+        }
+        else {
+            die 'Must pass a file to work on. See -h';
+        }
     }
     catch {
         croak "Die: $_";
@@ -215,11 +225,13 @@ __END__
 #----------------------------------------------------------------------------
 =pod
 
-=head1 NAME
+=head1 cgm.pl
 
-<+FILE+> - <+DESCRIPTION+>
+Main entry into MUTINY Tahiti's project CGM module
 
 =head1 SYNOPSIS
+
+cgm.pl -f file
 
 =head1 VERSION
 
@@ -227,7 +239,7 @@ Version 0.11  - Mer 18 fév 2015 18:07:33 PST
 
 =head1 USAGE
 
- <+FILE+> [OPTIONS]
+cgm.pl [OPTIONS]
 
 =head1 ARGUMENTS
 
@@ -235,6 +247,7 @@ Version 0.11  - Mer 18 fév 2015 18:07:33 PST
 
 =head1 OPTIONS
 
+    -f   --file            csv file to work on
     -h   --help            Print manual page and exits
     -V   --version         Print software version and exits
     -t   --trace           Turn debug mode on
