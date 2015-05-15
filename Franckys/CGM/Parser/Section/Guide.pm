@@ -136,7 +136,7 @@ sub dump {
 
         foreach $field (@$record) {
             $header = $headers[$field_index]; 
-            @field_values = map { s|\R+|<br />|gs; $_ } @{ $self->get_record_final_values( $record, $field_index ) };
+            @field_values = map { s|\R+|<br />|gs; $_ } @{ $self->get_record_final_value( $record, $field_index ) };
 #say("[GUIDE] fieldindex:$field_index header:$header fieldValues:", scalar @field_values);
 
             if ($header && @field_values) {

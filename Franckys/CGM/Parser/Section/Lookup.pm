@@ -1,6 +1,6 @@
 #===============================================================================
 #
-#         FILE: Franckys/CGM/Parser/Section/Collections.pm
+#         FILE: Franckys/CGM/Parser/Section/Lookup.pm
 #
 #        USAGE: <+USAGE+>
 #
@@ -21,7 +21,7 @@
 # www.franckys.com
 # Tous droits réservés - All rights reserved
 #===============================================================================
-package Franckys::CGM::Parser::Section::Collections;
+package Franckys::CGM::Parser::Section::Lookup;
 use version; our $VERSION = 'v0.11';           # Keep on same line
 use v5.20;                                      ## no critic (ValuesAndExpressions::ProhibitVersionStrings)
 use strict;
@@ -30,7 +30,7 @@ use autodie;
 use feature             qw( switch say unicode_strings );
 use parent              'Franckys::CGM::Parser::AnySection';
 use Const::Fast;
-
+use Franckys::MuffinMC;
 # use Carp                qw( carp croak confess cluck );
 # use Text::CSV           'v1.32';
 # use File::Copy
@@ -68,10 +68,8 @@ use open qw( :encoding(UTF-8) :std );
 # GLOBAL OBJECTS AND CONSTANTS
 #----------------------------------------------------------------------------
 # CONSTANTS
-const my $ID_INDEX => 2;
 
 # GLOBALS
-
 
 #----------------------------------------------------------------------------
 # Generic Getters (overload at your own risk)
@@ -104,62 +102,69 @@ const my $ID_INDEX => 2;
 # MAY BE OVERLOADED
 #----------------------------------------------------------------------------
 # $section->dump();                         => HTML
-# $section->dump_record( $record )          => Called by dump() for each record
 # $html                     = $section->record_as_html($record) => HTML, called by above
+#
 # my $bool                  = $section->is_field_mandatory($index);
 # my $bool                  = $section->need_eval( $field_index );
 # my $record                = $section->validate_record( $record );
 #----------------------------------------------------------------------------
-sub need_eval { 1 };
+sub need_eval { 0 }
 
-
-##
-# my $record = $section->validate_record($record);
-# 
-# Creates the following muffinMC variables:
-#   Collections.<ID>.<FIELDNAME>  = cellvalue
-#
 sub validate_record {
     my ($self, $record) = @_;
 
-    # Get data
-    my $section_name    = $self->name();
-    my @headers         = $self->headers();
-    my ($ID)            = @{ $self->get_record_final_value($record, $ID_INDEX) };
+    my ($expression) = @{ $self->get_record_final_value($record, 3) };
 
-    # MuffinMC Collections.<ID>.<FIELDNAME> = cellvalue
-    my $i = 0;
-    foreach my $header (@headers) {
-        if ($header) {
-            $self->set_muffin_variable(
-                "${section_name}.${ID}.${header}",
-                $self->get_record_final_value($record, $i),
-            );
-        }
-        $i++;
-    }
+    # Evaluate and sets the value
+    $record->[4] = $self->EVAL(3, $expression);
+    #$record->[4] = [ $expression ];
 
     return $record;
 }
+
+
+###
+# POST DUMP
+#
+# $section->dump_post();
+sub dump_post {
+    my $self = shift;
+    return ();
+
+    #@{ muffin_dump_vars() };
+    my $href = muffin_dump_vars();
+    my %muffinvars = %$href;
+
+    return
+        "<h1>Muffin Variables</h1>\n",
+        "  <dl>\n",
+        (
+            map {
+                sprintf("    <dt>%s</dt><dd>%s</dd>\n",
+                        $_, 
+                        (ref $muffinvars{$_} eq 'ARRAY')
+                            ?  "@{ $muffinvars{$_} }"
+                            : $muffinvars{$_}
+                )
+            } sort keys %muffinvars
+        ),
+        "  </dl>\n",
+        ;
+}
+
+
 #-----
 1;
 __END__
-#----------------------------------------------------------------------------
-# AUTOMATIC DATA
-#----------------------------------------------------------------------------
-
 
 #----------------------------------------------------------------------------
 # DOCUMENTATION
 #----------------------------------------------------------------------------
 =pod
 
-=head1 Franckys::CGM::Parser::Section::Default
+=head1 Franckys::CGM::Parser::Section::Lookup;
 
-Franckys/CGM/Parser/Section.pm - Provides the generic class
-constructor, getters and setters for every specialized specific Section subclasses.
-Default to generic handlers if no specialized class exists for any required
-section.
+Provides the specialized class to handle the Variables section
 
 =head1 VERSION
 

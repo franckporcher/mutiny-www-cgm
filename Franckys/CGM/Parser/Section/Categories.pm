@@ -28,11 +28,10 @@ use strict;
 use warnings;
 use autodie;
 use feature             qw( switch say unicode_strings );
-
 use parent              'Franckys::CGM::Parser::AnySection';
+use Const::Fast;
 
 # use Carp                qw( carp croak confess cluck );
-# use Const::Fast;
 # use Text::CSV           'v1.32';
 # use File::Copy
 # use Scalar::Util;
@@ -69,6 +68,7 @@ use open qw( :encoding(UTF-8) :std );
 # GLOBAL OBJECTS AND CONSTANTS
 #----------------------------------------------------------------------------
 # CONSTANTS
+const my $ID_INDEX  => 2;
 
 # GLOBALS
 
@@ -111,6 +111,62 @@ use open qw( :encoding(UTF-8) :std );
 #----------------------------------------------------------------------------
 sub need_eval { 1 };
 
+
+##
+# my $record = $section->validate_record($record);
+# 
+# Creates the following muffinMC variables:
+#   Categories.<ID>.<FIELDNAME>  = cellvalue
+#
+sub validate_record {
+    my ($self, $record) = @_;
+
+    # Get data
+    my $section_name    = $self->name();
+    my @headers         = $self->headers();
+    my ($ID)            = @{ $self->get_record_final_value($record, $ID_INDEX) };
+
+    # MuffinMC Categories.<ID>.<FIELDNAME> = cellvalue
+    my $i = 0;
+    foreach my $header (@headers) {
+        if ($header) {
+            $self->set_muffin_variable(
+                "${section_name}.${ID}.${header}",
+                $self->get_record_final_value($record, $i),
+            );
+        }
+        $i++;
+    }
+
+    return $record;
+}
+
+
+# (void) $section->validate_cell(index, header, value)
+#
+# Can return 0, 1 or more FINAL records to be added
+my $current_id;
+sub validate_cell {
+    my ($self, $index, $header, $final) = @_;
+
+    my $section_name = $self->name();
+
+    if ($index == $ID_INDEX) {
+        $current_id = $final->[0];
+        $self->set_muffin_variable(
+            "${section_name}.${current_id}.${header}",
+            $final,
+        );
+    }
+    elsif (($index > $ID_INDEX) && $header) {
+        $self->set_muffin_variable(
+            "${section_name}.${current_id}.${header}",
+            $final,
+        );
+    }
+
+    return $final;
+}
 
 #-----
 1;

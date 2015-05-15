@@ -276,17 +276,17 @@ sub has_error {
         ;
 }
 
-# my $Franckys::Error = $section->set_error($err_tag, $param);
+# my $Franckys::Error = $section->set_error($err_tag, @params);
 #
 # /!\ Must return a Franckys::Error object that accepts as_string() method.
 sub set_error {
-    my ($self, $err_tag, $param) = @_;
+    my ($self, $err_tag, @params) = @_;
 
     return $self->{error}->Error(
         $err_tag, 
         [   $self->name(), 
             get_IFN() + 1, 
-            $param,
+            "@params",
         ],
         $self, # $section transmitted as datum
     ); 
@@ -422,6 +422,8 @@ sub generate_records {
          $is_template,
     );
 
+    my @headers = $self->headers();
+
     ##
     # PHASE I Evaluation (cell strings -> field values)
     $field_index = 0;
@@ -432,6 +434,9 @@ sub generate_records {
 
                 # Compute field value
                 $field_value = $self->compute_field_value($field_index, $_);
+
+                # Hook
+                $field_value = $self->validate_cell($field_index, $headers[$field_index], $field_value);
 
                 # Set MuffinMC auto-variables 
                 $self->set_muffin_recordfield_variables($field_index, $field_value);
@@ -461,7 +466,7 @@ sub generate_records {
           ;
     
     ##
-    # /!\ PHASE II Evaluation (lazy fields & iterators)
+    # PHASE II Evaluation (lazy fields & iterators)
     trace("PHASE II GENERATION : ", scalar( @final_records ) . " final records", @final_records );
     foreach $record ( @final_records ) {
         for ($field_index = 0; $field_index < @$record; $field_index++) {
@@ -477,6 +482,9 @@ sub generate_records {
                 $record->[$field_index] = $lazy_sub->();
                 trace("## Lazy_field index:[$field_index] --> ", $record->[$field_index]);
             }
+
+            # Hook
+            $record->[$field_index] = $self->validate_cell($field_index, $headers[$field_index], $record->[$field_index]);
 
             # Set MuffinMC final auto-variables 
             $self->set_muffin_recordfield_variables($field_index, $record->[$field_index]);
@@ -543,10 +551,17 @@ sub template_based_cross_product_generation {
 #
 # Can return 0, 1 or more FINAL records to be added
 sub validate_record {
-    $_[1]
+    return $_[1];
 }
 
-# my $field_value_ar = $section->sub compute_field_value( $field_index, $cell_string);
+# (void) $section->validate_cell(index, header, value)
+#
+# Can return 0, 1 or more FINAL records to be added
+sub validate_cell {
+    return $_[3];
+}
+
+# my $final = $section->sub compute_field_value( $field_index, $cell_string);
 sub compute_field_value {
     my ($self, $field_index, $cell_string) = @_;
     tracein(ref($self), $field_index,$cell_string);
@@ -820,19 +835,53 @@ sub dump {
     my $self = shift;
     my $section_name = $self->name();
 
+    say
+        $self->dump_pre(),
+        $self->dump_name(),
+        $self->dump_headers(),
+        $self->dump_records(),
+        $self->dump_post();
+}
 
-    ###
-    # SECTION HEADER
-    #
-    say sprintf('<h1>Section <i>%s</i></h1>', $section_name );
-    #say "\tFields: ",   $self->nb_fields();
 
-    ###
-    # SECTION HEADERS
-    #
+###
+# PRE DUMP
+#
+# $section->dump_pre();
+sub dump_pre {
+    my $self = shift;
+    my $section_name = $self->name();
+
+    return ();
+}
+
+
+###
+# SECTION NAME
+#
+# $section->dump_name();
+sub dump_name {
+    my $self = shift;
+    my $section_name = $self->name();
+
+    #"\tFields: ",   $self->nb_fields();
+    return sprintf("<h1>Section <i>%s</i></h1>\n", $section_name );
+}
+
+
+###
+# SECTION HEADERS
+#
+# $section->dump_headers();
+sub dump_headers {
+    my $self = shift;
+    my $section_name = $self->name();
+
     my @labeled_headers = grep { length > 0 } $self->headers();
-    say sprintf('<h2>%d Champs</h2>', scalar(@labeled_headers) );
-    say '<ul>',
+
+    return
+        sprintf("<h2>%d Champs</h2>\n", scalar(@labeled_headers) ),
+        "<ul>\n",
         (
           map {
             my $is_mandatory_field
@@ -852,7 +901,7 @@ sub dump {
                   )->[0];
 
             sprintf(
-                "<li>%s%s%s</li>",
+                "<li>%s%s%s</li>\n",
                 $_,
                 $is_mandatory_field
                     ? '<b><sup>*</sup></b>'
@@ -864,7 +913,7 @@ sub dump {
 
           } @labeled_headers,
         ),
-        '</ul>'
+        "</ul>\n"
         ;
 
     ###
@@ -887,17 +936,40 @@ sub dump {
     #say "[CMP] @named_headers";
     #say "[CMP] @dup_named_headers";
     #say "@named_headers" eq "@dup_named_headers" ? 'OK' : 'KO';
-
-    ###
-    # SECTION RECORDS
-    #
-    my @records = $self->records(); 
-    say sprintf('<h2>Enregistrements (%d)</h2>', scalar(@records) );
-    say "<ol>" ; 
-    say sprintf('<li>%s</li>', $self->record_as_html($_)) foreach @records;
-    say "</ol>" ; 
-    say "";
 }
+
+
+###
+# SECTION RECORDS
+#
+# $section->dump_records();
+sub dump_records {
+    my $self = shift;
+    my $section_name = $self->name();
+
+    my @records = $self->records(); 
+
+    return
+        sprintf("<h2>Enregistrements (%d)</h2>\n", scalar(@records) ),
+        "<ol>\n",
+        ( map { sprintf("<li>%s</li>\n", $self->record_as_html($_)) } @records ),
+        "</ol>\n",
+        "<br />\n",
+        ;
+}
+
+
+###
+# POST DUMP
+#
+# $section->dump_post();
+sub dump_post {
+    my $self = shift;
+    my $section_name = $self->name();
+
+    return "\n<p>DUMP POST FROM: $self\n";
+}
+
 
 ###
 sub record_as_html {

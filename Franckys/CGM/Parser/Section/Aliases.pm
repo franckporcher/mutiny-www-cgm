@@ -182,7 +182,7 @@ __END__
 #----------------------------------------------------------------------------
 =pod
 
-=head1 Franckys::CGM::Parser::Section::Variables
+=head1 Franckys::CGM::Parser::Section::Aliases
 
 Provides the specialized class to handle the Variables section
 

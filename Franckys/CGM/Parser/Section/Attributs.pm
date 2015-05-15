@@ -28,11 +28,10 @@ use strict;
 use warnings;
 use autodie;
 use feature             qw( switch say unicode_strings );
-
 use parent              'Franckys::CGM::Parser::AnySection';
-
+use Franckys::MuffinMC;
+use Const::Fast;
 # use Carp                qw( carp croak confess cluck );
-# use Const::Fast;
 # use Text::CSV           'v1.32';
 # use File::Copy
 # use Scalar::Util;
@@ -68,7 +67,9 @@ use open qw( :encoding(UTF-8) :std );
 #----------------------------------------------------------------------------
 # GLOBAL OBJECTS AND CONSTANTS
 #----------------------------------------------------------------------------
-# CONSTANTS
+# CONSTANTS (count at 0)
+const my $ATTRNAME_INDEX    => 3;
+const my $ATTRNAME_VALUES   => 8;
 
 # GLOBALS
 
@@ -110,6 +111,59 @@ use open qw( :encoding(UTF-8) :std );
 # my $record                = $section->validate_record( $record );
 #----------------------------------------------------------------------------
 sub need_eval { 1 };
+
+##
+# my $record = $section->validate_record($record);
+# 
+# Creates the following muffinMC variables:
+#   <ATTRNAME> = values
+#   <ATTRNAME>.<FIELDNAME>   = cellvalue
+#   <ATTRNAME>[i]            = ième valeur de l'attribut (i commence à 1)
+#   <ATTRNAME>[value]        = i                         (i commence à 1)
+#
+sub validate_record {
+    my ($self, $record) = @_;
+
+    # Get data
+    my @headers         = $self->headers();
+    my ($attr_name)     = @{ $self->get_record_final_value($record, $ATTRNAME_INDEX) };
+    my $attr_values     =    $self->get_record_final_value($record, $ATTRNAME_VALUES);
+
+    # MuffinMC <ATTRNAME> = values
+    $self->set_muffin_variable(
+        $attr_name,
+        $attr_values,
+    );
+
+    # MuffinMC <ATTRNAME>[i]         = attrvalue
+    #          <ATTRNAME>[attrvalue] = i
+    my $i = 1;
+    foreach my $value ( @{ $attr_values } ) {
+        $self->set_muffin_variable(
+            "${attr_name}\[$i]",
+            [ $value ]
+        );
+        $self->set_muffin_variable(
+            "${attr_name}\[$value]",
+            [ $i ]
+        );
+        $i++;
+    }
+
+    # MuffinMC <ATTRNAME>.<FIELDNAME> = cellvalue
+    $i = 0;
+    foreach my $header (@headers) {
+        if ($header) {
+            $self->set_muffin_variable(
+                "${attr_name}.${header}",
+                $self->get_record_final_value($record, $i),
+            );
+        }
+        $i++;
+    }
+
+    return $record;
+}
 
 
 #-----
