@@ -408,7 +408,13 @@ sub is_template_field {
 #
 #============================================================================
 # my $bool = $section->need_eval( $field_index );
-sub need_eval { 0 }
+sub need_eval { return 0 }
+
+# my $bool = $section->resolve_lazy( $field_index );
+sub resolve_lazy { return 1 }
+
+# my $bool = $section->resolve_iterator( $field_index );
+sub resolve_iterator { return 1 }
 
 # $n = $section->generate_records($row);
 sub generate_records {
@@ -419,7 +425,8 @@ sub generate_records {
          $field_index, 
          $field_value, 
          $lazy_sub,
-         $is_template,
+         $record_isa_template,
+         @tmplflags,
     );
 
     my @headers = $self->headers();
@@ -444,10 +451,8 @@ sub generate_records {
                 # Check template generation status
                 # Field must be 'template enabled'
                 # and must bear more than one value
-                $is_template
-                    ||= ( $self->is_template_field($field_index)
-                          && @$field_value > 1
-                );
+                $tmplflags[@tmplflags] = $self->is_template_field($field_index);
+                $record_isa_template ||= $tmplflags[-1] && @$field_value > 1;
 
                 # Don't forget that ;)
                 $field_index++;
@@ -460,13 +465,13 @@ sub generate_records {
     my $nb_generated_records = 0;     # Number of final generated records for this row
 
     my @final_records 
-        = $is_template
-          ? $self->template_based_cross_product_generation(@record_template) 
+        = $record_isa_template
+          ? $self->template_based_cross_product_generation(\@tmplflags, @record_template) 
           : ( [@record_template] )
           ;
     
     ##
-    # PHASE II Evaluation (lazy fields & iterators)
+    # PHASE II Evaluation :: Resolve late values (lazy) & iterators
     trace("PHASE II GENERATION : ", scalar( @final_records ) . " final records", @final_records );
     foreach $record ( @final_records ) {
         for ($field_index = 0; $field_index < @$record; $field_index++) {
@@ -475,12 +480,21 @@ sub generate_records {
             $self->set_IFN($field_index);
 
             # Compute Lazy value or Iterator sequence next value
-            if ( $lazy_sub  = (    Franckys::MuffinMC::muffin_isa_lazy(     $record->[$field_index] )
-                                || Franckys::MuffinMC::muffin_isa_iterator( $record->[$field_index] )
-                       )
+            if ( 
+                 ( $lazy_sub = Franckys::MuffinMC::muffin_isa_lazy( $record->[$field_index] ) )
+                 && $self->resolve_lazy($field_index)
             ) {
-                $record->[$field_index] = $lazy_sub->();
+                #$record->[$field_index] = [ sprintf('PHASE-II-LAZY::%s. Section(%s) RN(%d)', $lazy_sub, $self->name(), $self->nb_records() + 1) ];
+                $record->[$field_index] = $lazy_sub->($self, $record, $field_index);
                 trace("## Lazy_field index:[$field_index] --> ", $record->[$field_index]);
+            }
+            elsif (
+                    ( $lazy_sub = Franckys::MuffinMC::muffin_isa_iterator( $record->[$field_index] ) )
+                    && $self->resolve_iterator($field_index)
+            ) {
+                #$record->[$field_index] = [ sprintf('PHASE-II-IT::%s. Section(%s) RN(%d)', $lazy_sub, $self->name(), $self->nb_records() + 1) ];
+                $record->[$field_index] = $lazy_sub->(1, $self, $record, $field_index);
+                trace("## IT_field index:[$field_index] --> ", $record->[$field_index]);
             }
 
             # Hook
@@ -515,36 +529,39 @@ sub generate_records {
 # The number of arguments sets the arity of the final records, to be seen as
 # valued-vectors.
 sub template_based_cross_product_generation {
-    my $self = shift;
-    tracein(ref($self), @_);
+    my ($self, $tmplflags_ar, @fields) = @_;
+    tracein(ref($self), @fields);
 
-    if ( @_ == 0) {
-        traceout( [] );
-        return [];
+    my @records;
+
+    if ( @fields == 0) {
+        @records = ( [] );
     }
     else {
-        my $field = shift;
+        my $field    = shift @fields;
+        my $tmplflag = shift @$tmplflags_ar;
 
-        my @records = $self->template_based_cross_product_generation( @_ );
+        @records = $self->template_based_cross_product_generation($tmplflags_ar, @fields);
 
-        if ( $#$field < 1 ) {
-            unshift @$_, $field  foreach @records;
-        }
-        else {
+        if ( (@$field  > 1) && $tmplflag ) {
             @records
                 = map {
-                    my $record = $_;
-                    map { 
-                        my $clone = [ @$record ];
-                        unshift @$clone, [ $_ ];
-                        $clone;
-                    } @$field ;
-                } @records;
+                      my $field_value = $_;
+                      map { 
+                          my $record = $_;
+                          my $record_clone  = [ @$record ];
+                          unshift @$record_clone, [ $field_value ];
+                          $record_clone;
+                      } @records
+                  } @$field;
         }
-
-        traceout( @records );
-        return @records;
+        else {
+            unshift @$_, [ @$field ]  foreach @records;
+        }
     }
+
+    traceout( @records );
+    return @records;
 }
 
 # my undef | $record =  $section->validate_record($record);
@@ -576,14 +593,14 @@ sub compute_field_value {
             if ( my $field_default_value
                     = $self->get_field_default_value( $field_index )
             ) {
-                # <Section>.<Field>.Default
+                # Access <Section>.<Field>.Default
                 if ( ref( $field_default_value ) eq 'ARRAY' ) {
-                    # We reached a [...] final value   
+                    # FINAL VALUE [...]
                     $field_value = $field_default_value;
                 }
                 else {
-                    # We reached a new literal string
-                    # that substitutes to the empty cell_string
+                    # ALIAS VALUE (a literal string
+                    # that substitutes to the empty cell_string)
                     $cell_string = $field_default_value;
                 }
             }

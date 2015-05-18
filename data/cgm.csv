@@ -118,17 +118,17 @@ Dans ce cas, vous devez simplement indiquer dans le champ "URL simplifiée" les 
 			|Produits.Nom.Default|	|NO NAME|																		
 			|Produits.Marque.Default|	|MUTINY TAHITI|		|Other values are : "color" et radio-buttons (what is the code for prestashop)|																
 			|Produits.Fournisseur.Default|	|KOKOLO|																		
-																						
-																						
-		|Fonctions|																				
-			|cat_descr|	|'( ?( $(#)  "#(self $("Categories.$(_1).ParentID"))/ "(!(!:quote :join-with "/ ")$("Categories.$(_1).Nom"))" ))|																		
-			|ean13_data|	|'($(_2) $("$(_1).$(_2).L(Ordre Digits)EAN13"))|																		
+			|Categories.Description.Default|	|Q(#(cat_descr $("$(ROW).ID")))|																		
+			|Produits.EAN13.Default|	|Q(#(ean13_data))|																		
+		|Formules|																				
+			|cat_descr|	|'( ?( $(#)  "(   !(!:quote :join-with "/ ")    #(self $("Categories.$(_1).ParentID") )   $("Categories.$(_1).Nom") )))|																		
+			|ean13_data_cc|	|'($(_2) $("$(_1).$(_2).L(Ordre Digits)EAN13"))|																		
 			|ean13_data_attr|	|'(#(1- $(_2))  $("$(_1).L(Ordre Digits)EAN13"))|		|'(#(1- $(_2))  $("$(_1).L(Ordre Digits)EAN13"))|			|'("( !( !:quote :join-with " ") $(@)))    |													
-			|ean13|	|'(#(ean13_data Collections  $("$(ROW).CollectionID")) #(ean13_data Categories  $("$(ROW).CategorieID")) #(map '(#(ean13_data_attr S( !( :split-on =) _1 ))) S("$(ROW).AttributsFixes") S("$(ROW).AttributsDeclinaisons"))) |																		
-			|ean13|	|'(#(ean13_data Collections  $("$(ROW).CollectionID")) #(ean13_data Categories  $("$(ROW).CategorieID")) #(map '(#(ean13_data_attr S( !( :split-on =) _1))) S("$(ROW).AttributsL(Fixes Declinaisons)"))) |																		
+			|ean13_data|	|'(#(ean13_data_cc Collections  $("$(ROW).CollectionID")) #(ean13_data_cc Categories  $("$(ROW).CategorieID")) #(map '(#(ean13_data_attr S( !( :split-on =) _1))) S("$(ROW).AttributsL(Fixes Declinaisons)"))) |																		
+																						
 |Aliases|		|Classe|	|Nom|	|Valeur|	|Comment|																	
-			|Categories.Description.Default|	|#(cat_descr $("$(ROW).ID"))|																		
-			|Produits.EAN13.Default|	|Q(#(ean13))|	|Q($(RN))|																	
+																						
+																						
 																						
 																						
 																						
@@ -205,7 +205,7 @@ Dans ce cas, vous devez simplement indiquer dans le champ "URL simplifiée" les 
 																						
 																						
 |Produits|	|Op*|	|CollectionID*|	|CategorieID*+|	|AttributsFixes|	|AttributsDeclinaisons+|	|Nom*|	|Marque*|	|Fournisseur*|	|BasePrixHT*|	|DeltaPrixHT*|	|BasePoids*|	|DeltaPoids*|	|Stock*|	|EAN13*|	|LxPxH|	|Resume*|	|Description*|	|BaliseTitre|	|MotsCles|	|MetaDescr|	|URLSimple|	|URLImage*|
-		|1|	|201 202 203|	|FAB=1|	|"A(MODEL= 1 2 3)  A(XTRA= "1 2"  3   "4 5")  A(TH= 3 4 5)   A(CT= 1 3 4 5 6)"|				|NA|	|NA|	|NA|	|NA|	|NA|			|NA|	|NA|					|NA|
+		|1|	|201 202 203|	|FAB=1|	|"A(MODEL= 1 2 3)  A(XTRA= "1 2"  3   "4 5")  A(TH= 3 4 5)   A(CT= 1 3 4 5 6)"|	|NO NAME|	|MUTINY TAHITI|	|KOKOLO|	|NA|	|NA|	|NA|	|NA|	|NA|			|NA|	|NA|					|NA|
 																						
 																						
 																						

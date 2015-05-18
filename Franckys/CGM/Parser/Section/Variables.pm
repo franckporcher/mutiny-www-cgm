@@ -119,6 +119,12 @@ const my $VARVALUE_FIELDINDEX   => 4;
 # Their definitions are evaled to produce final [...] values
 sub need_eval { 1 }
 
+# my $bool = $section->resolve_lazy( $field_index );
+sub resolve_lazy { return 0 }
+
+# my $bool = $section->resolve_iterator( $field_index );
+sub resolve_iterator { return 0 }
+
 # my $record = $section->validate_record($record);
 sub validate_record {
     my ($self, $record) = @_;
@@ -136,7 +142,6 @@ sub validate_record {
         return; # Ignore record
     }
 }
-
 
 # $section->record_as_html($record);
 sub record_as_html {

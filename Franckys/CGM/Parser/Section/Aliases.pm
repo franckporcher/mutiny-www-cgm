@@ -118,6 +118,12 @@ const my $VARVALUE_FIELDINDEX   => 4;
 # Pour évaluation lors d'utilisation ultérieure.
 sub need_eval { 0 }
 
+# my $bool = $section->resolve_lazy( $field_index );
+sub resolve_lazy { return 0 }
+
+# my $bool = $section->resolve_iterator( $field_index );
+sub resolve_iterator { return 0 }
+
 # my $record = $section->validate_record($record);
 sub validate_record {
     my ($self, $record) = @_;
