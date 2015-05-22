@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
  <head>
-  <meta http-equiv="Content-type" content="text/html; charset=<% settings.charset %>" />
+    <meta http-equiv="Content-type" content="text/html; charset=<% settings.charset %>" />
     <title>Catalogue Général Mutiny</title>
-    <link rel="stylesheet" href="/cgm/css/cgm.common.css" />
-    <link rel="stylesheet" href="/cgm/css/cgm.muffinmc.css" />
+    <meta name="author"       content="Francky's Engineering" />
+    <meta name="copyright"    content="Copyright (C) 2014-2015 - Francky's Engineering - All rights reserved" />
+    <meta name="description"  content="Francky's MuffinMC Language and WebConsole for MUTINY Tahiti's online website." />
+    <meta name="keywords"     content="Franck PORCHER,Francky's Engineering,Francky's Belize, Francky's Paris, Francky's Tahiti, Francky's Vancouver,Open Source Software Engineering,Creative IT, Creative design, Innovative Web Solutions,MUTINY Tahiti,Fashion,Surfwear, Tahiti, Multimedia" />
+    <link rel="author"        href="mailto:franck.porcher@gmail.com" />
+    <link rel="stylesheet"    href="/cgm/css/cgm.common.css" />
+    <link rel="stylesheet"    href="/cgm/css/cgm.muffinmc.css" />
 
    <!-- Grab jQuery from a CDN, fall back to local if necessary -->
     <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>

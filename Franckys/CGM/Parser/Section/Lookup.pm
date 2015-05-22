@@ -132,8 +132,8 @@ sub dump_post {
     return ();
 
     #@{ muffin_dump_vars() };
-    my $href = muffin_dump_vars();
-    my %muffinvars = %$href;
+    my $final = muffin_dump_vars();
+    my %muffinvars = @$final;
 
     return
         "<h1>Muffin Variables</h1>\n",

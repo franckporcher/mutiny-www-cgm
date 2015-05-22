@@ -95,6 +95,8 @@ my $Section = bless {} => __PACKAGE__;
         __PACKAGE__->set_muffin_variable( 'NIL' =>       [   ]                           );  # NIL VALUE
         __PACKAGE__->set_muffin_variable( 'ZERO'=>       [ 0 ]                           );
         __PACKAGE__->set_muffin_variable( 'UN'  =>       [ 1 ]                           );
+        __PACKAGE__->set_muffin_variable( 'CR'  =>       [ "\n" ]                        );
+        __PACKAGE__->set_muffin_variable( 'TAB' =>       [ "\t" ]                        );
 
         #--- MUFFINMC SPECIAL VARIABLES (SET ONCE FOR ALL ; SORT OF ALIASES; TO BE EXPANDED AT USE)
         __PACKAGE__->set_muffin_variable( 'ROW'     => '"$(SN)[$(RN)]"' );                   # ROW, to be used in $(.xxx) => $($(ROW).xxx)
@@ -984,7 +986,8 @@ sub dump_post {
     my $self = shift;
     my $section_name = $self->name();
 
-    return "\n<p>DUMP POST FROM: $self\n";
+    #return "\n<p>DUMP POST FROM: $self\n";
+    return ();
 }
 
 

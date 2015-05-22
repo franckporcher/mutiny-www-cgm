@@ -406,7 +406,7 @@ td.MC.blob-line-code:first-of-type {
     font-weight:    normal;
 }
 .MC.SC.tt_prog1     { 
-    color: rgb(250, 128,  34);
+    color: rgb(224, 128,  34);
     font-weight:    normal;
 }
 .MC.SC.tt_evalmeta  { 
@@ -438,6 +438,14 @@ td.MC.blob-line-code:first-of-type {
     color: rgb(153,   0, 152);
     font-weight:    normal;
 }
+.MC.SC.tt_matching { 
+    color: rgb(255,   160, 0);
+    font-weight:    normal;
+}
+.MC.SC.tt_trace { 
+    color: rgb(0,   228, 228);
+    font-weight:    normal;
+}
 
 .MC.SC.tt_defvar:before    {content: "=(";}
 .MC.SC.tt_getval:before    {content: "$(";}
@@ -458,6 +466,8 @@ td.MC.blob-line-code:first-of-type {
 .MC.SC.tt_warning:before   {content: "W(";}
 .MC.SC.tt_associer:before  {content: "A(";}
 .MC.SC.tt_pragma:before    {content: "!("; }
+.MC.SC.tt_matching:before  {content: "~("; }
+.MC.SC.tt_trace:before     {content: "T("; }
 
 .MC.SC.tt_defvar:after     {content: ")"; }
 .MC.SC.tt_getval:after     {content: ")"; }
@@ -478,6 +488,8 @@ td.MC.blob-line-code:first-of-type {
 .MC.SC.tt_warning:after    {content: ")"; }
 .MC.SC.tt_associer:after   {content: ")"; }
 .MC.SC.tt_pragma:after     {content: ")"; }
+.MC.SC.tt_matching:after   {content: ")"; }
+.MC.SC.tt_trace:after      {content: ")"; }
 
 
 #muffinmc-logs  {

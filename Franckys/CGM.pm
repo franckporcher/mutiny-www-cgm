@@ -23,7 +23,7 @@ $Data::Dumper::Deparse  = 1;
 my %SES_SECRETS = (
     Pierre      => '2bbc4741a60d00686ad1d62772a2be2e',
     Erik        => '9c89b632c3cb766ea77b14181fcbe9b8',
-    #Franck      => 'bd80c0a6b7ead1e7e233053e0b9e1fed',
+    Franck      => 'bd80c0a6b7ead1e7e233053e0b9e1fed',
     fpo         => '',
     Guest       => 'd04e332211f4c2bd0c024906a7615fd6',
 );
@@ -33,11 +33,19 @@ my %SES_INDICES = (
     Erik        => 'A()I()U()',
     Franck      => 'new(ILC)',
     Guest       => 'IL(3)Mutiny',
+    fpo         => '...',
+);
+
+my %SES_TIMEOUT = (
+    Pierre      => 60 * 60,
+    Erik        => 60 * 60,
+    Franck      => 60 * 60,
+    Guest       => 15 * 60,
+    fpo         => 0, 
 );
 
 my $DEBUG   = 0;
 my $APPNAME ='';
-my $SESSION_MAX_INACTIVITY = 60 * 15;   # Session expires after 15' of inactivity
 
 my $APP = {
     cgm         => {
@@ -329,8 +337,6 @@ sub create_session {
 
     }
     else {
-        my $ref  = $SES_SECRETS{$username};
-        my $comp = md5_hex($username, $password);
         set_flash("Utilisateur inconnu du système: <i>$username</i>", 'warn');
         return {
             status      => 0,
@@ -354,17 +360,22 @@ sub check_session {
             && exists $session->{last_seen}
         ) {
             # Check that session is valid
+            #       SessionID
+            #       IP address 
+            #       Timestamp == start
             if ( exists $SES_SECRETS{ $session->{user} }
                  && $session->{sessionid} eq md5_hex($SES_SECRETS{ $session->{user} }, request->address())
                  && (scalar localtime($session->{timestamp})) eq $session->{start}
             ) {
                 my $time = time;
-                if ( $time - $session->{last_seen} > $SESSION_MAX_INACTIVITY ) {
+                if ( $SES_TIMEOUT{ $session->{user} } 
+                     && (  ($time - $session->{last_seen})  >  $SES_TIMEOUT{ $session->{user} } )
+                ) {
                     $status_msg = 'session_expired';
                     goto RETURN_CHECK_SESSION;
                 }
                 else {
-                    # Session OK
+                    # Session OK -> Update status & last_seen
                     $session->{status}     = 1;
                     $session->{status_msg} = 'session_ok';
                     $session->{last_seen}  = $time;
