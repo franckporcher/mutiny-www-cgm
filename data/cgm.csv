@@ -31,20 +31,20 @@ XTRA=1 500 XTRA=4 500 XTRA=6 1000|
 			|Produits.EAN13.Default|	|Q(  #(ean13 #(ean13_data)))|																		
 			|Produits.Resume.Default|	|Q( "( !(:join-with $(CR))   #(resume_produit)))|																		
 																						
-																						
 		|Formules MuffinMC|																				
 			|categorie_short_description|	|'(    ?( $(#) #(self $("Categories.$(_1).ParentID"))) $("Categories.$(_1).Nom") ) |																		
 																						
 			|ean13_collection|	|'(  #(+ #(* $("Collections.$(_1).Type") 100) $("Collections.$(_1).Numero")) $("Collections.$(_1).L(Ordre Digits)EAN13"))|																		
 			|ean13_categorie|	|'($(_1) $("Categories.$(_1).L(Ordre Digits)EAN13")) |																		
-			|ean13_attribut|	|'(#(1- $(_2))  $("$(_1).L(Ordre Digits)EAN13"))|		|'(#(1- $(_2))  $("$(_1).L(Ordre Digits)EAN13"))|			|'("( !( !:quote :join-with " ") $(@)))    |													
-			|ean13_data|	|'(     #(ean13_collection $("$(ROW).CollectionID"))     #(ean13_categorie $("$(ROW).CategorieID"))     #(map '( #(ean13_attribut S( !( :split-on =) _1)))  #(attributs))    )|																		
+			|ean13_attribut|	|'(#(1- $(_2))  $("$(_1).L(Ordre Digits)EAN13"))|																		
+			|ean13_data|	|'( #(ean13_collection $("$(ROW).CollectionID"))     #(ean13_categorie $("$(ROW).CategorieID"))     #(map '( #(ean13_attribut S( !( :split-on =) _1)))  #(attributs))    )|																		
 																						
-			|attributs|	|'( S("$(ROW).AttributsL(Fixes Declinaisons)") )|		|Ex : FAB=4  MODEL=2  TH=3  CT=5  XTRA=5|																
-			|attribut|	|'( ~( !(:return-element) #(attributs) "$(_1)=*"))       |																		
-			|index_attribut|	|'( ~( #(attributs) "$(_1)=*" ))      |		|Ex : #(index_attribut FAB) → 4|																
-			|valeur_attribut|	|'( @( $($(_1)) #(index_attribut $(_1)) ))       |		|Ex : #(valeur_attribut FAB) → 100 % Coton|																
-			|valeur_attributs|	|'(  "( !( :join-with /) #(map valeur_attribut $(@)) )) |		|Ex : #(valeur_attributs FAB=4  MODEL=2  TH=3  CT=5  XTRA=5) → 100 % Coton, Taste of Paradise, M, DEEP HEATHER, Ouverture Boutons|																
+						|Ex : FAB=4  MODEL=2  TH=3  CT=5  XTRA=5|																
+			|attributs|	|'( S("$(ROW).AttributsL(Fixes Declinaisons)") )|																		
+			|attribut|	|'( ~( !(:return-element) #(attributs) "$(_1)=*"))       |		|Ex : #(index_attribut FAB) → 4|																
+			|index_attribut|	|'( ~( #(attributs) "$(_1)=*" ))      |		|Ex : #(valeur_attribut FAB) → 100 % Coton|																
+			|valeur_attribut|	|'( @( $($(_1)) #(index_attribut $(_1)) ))       |		|Ex : #(valeur_attributs FAB=4  MODEL=2  TH=3  CT=5  XTRA=5) → 100 % Coton, Taste of Paradise, M, DEEP HEATHER, Ouverture Boutons|																
+			|valeur_attributs|	|'(  "( !( :join-with /) #(map valeur_attribut $(@)) )) |																		
 																						
 			|resume_produit|	|'( "Collection "( !(:quote) $("Collections.$("$(ROW).CollectionID").Nom")) – #(valeur_attribut MODEL)"  "$("Categories.$("$(ROW).CategorieID").Description") - #(valeur_attribut XTRA)" #(valeur_attribut FAB)  #(valeur_attributs TH TF TE CT) ) |																		
 																						
@@ -53,6 +53,17 @@ XTRA=1 500 XTRA=4 500 XTRA=6 1000|
 			|supplement_prix_base|	|'( #(+ #(assoc #(attributs) $(Liste_Supplements_Prix))) )|																		
 																						
 			|show|	|'(  "$(#) => ,("( !( :join-with ",),("  )$(@)),)")|																		
+																						
+		|Equivalence CGM <> KINTPV|																				
+			|KINTPV.Code_Barre|	|EAN13|																		
+			|KINTPV.Nom_Article|	|Nom|																		
+			|KINTPV.Marque|	|Marque|																		
+			|KINTPV.Nom_Fournisseur|	|Fournisseur|																		
+			|KINTPV.Description|	|Resume|																		
+			|KINTPV.PrixVente_TTC|	|BasePrixHT DeltaPrixHT|																		
+			|KINTPV.QteEnStock|	|Stock|																		
+			|KINTPV.EAN13_Master_On|	|CT 1|	|Ne pas modifier ce libellé |																	
+			|KINTPV.TVA|	|16|																		
 																						
 |Aliases|		|Classe|	|Nom|	|Valeur|	|Comment|																	
 																						

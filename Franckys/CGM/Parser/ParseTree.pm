@@ -246,6 +246,22 @@ EOHTML
     $_->dump() foreach $self->get_sections();
 }
 
+
+#----------------------------------------------------------------------------
+# KINTPV GenerationI/O 
+#----------------------------------------------------------------------------
+sub to_kintpv {
+    my ($self, $kintpvfd) = @_;
+
+    foreach my $section ( $self->get_sections()) {
+        my ($cr, $msg) = $section->to_kintpv( $kintpvfd );
+        return ($cr, $msg) if $cr;
+    }
+
+    return (0, "ok");
+}
+
+
 #--------
 1;
 __END__

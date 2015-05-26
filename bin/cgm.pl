@@ -140,6 +140,8 @@ my %option = (
     #   rgb     => [],
     #   define  => {},
     file        => '',
+    kintpv      => '',
+    dump        => 0,
 );
 
 GetOptions(
@@ -154,7 +156,9 @@ GetOptions(
             trace_off();
         }
     },
+    'd|dump!'       => \$option{dump},
     'f|file=s'      => \$option{file},
+    'k|kintpv=s'    => \$option{kintpv},
     #
     # REMINDER ;-)
     #
@@ -189,7 +193,19 @@ sub main {
             my $parser = Franckys::CGM::Parser->new( $option{file} );
             Franckys::Error::die_if_error($parser);
             $parser->parse_file();
-            $parser->dump();
+
+            # Generation
+            if ( $option{kintpv} ) {
+                my ($cr, $msg) = $parser->to_kintpv( $option{kintpv} );
+
+                if ($cr) {
+                    print STDERR "[KINTPV Generation] $msg\n";
+                }
+            }
+
+            # HTML dump
+            $parser->dump()
+                if $option{dump};
         }
         else {
             die 'Must pass a file to work on. See -h';
@@ -214,15 +230,8 @@ sub main {
 # HELPERS
 #----------------------------------------------------------------------------
 
-
 __END__
-#----------------------------------------------------------------------------
-# AUTOMATIC DATA
-#----------------------------------------------------------------------------
 
-#----------------------------------------------------------------------------
-# DOCUMENTATION
-#----------------------------------------------------------------------------
 =pod
 
 =head1 cgm.pl
@@ -231,19 +240,22 @@ Main entry into MUTINY Tahiti's project CGM module
 
 =head1 SYNOPSIS
 
-cgm.pl -f file
+cgm.pl [options]
+
+ Options:
+    -f <file>  --file <file>     csv file to scan
+    -h         --help            Print manual page and exits
+    -V         --version         Print software version and exits
+    -t         --trace           Turn debug mode on
+               --notrace         Turn debug mode off
+    -d         --dump            Dump html result STDOUT
+               --nodump
+    -k <file>  --kintpv <file>   KinTPV-format output filename
 
 =head1 VERSION
 
 Version 0.11  - Mer 18 fév 2015 18:07:33 PST
 
-=head1 USAGE
-
-cgm.pl [OPTIONS]
-
-=head1 ARGUMENTS
-
-<+ARGUMENTS+>
 
 =head1 OPTIONS
 
@@ -252,6 +264,8 @@ cgm.pl [OPTIONS]
     -V   --version         Print software version and exits
     -t   --trace           Turn debug mode on
          --notrace         Turn debug mode off
+    -d   --dump            Dump html result STDOUT
+         --nodump
 
 =head1 DIAGNOSTICS
 

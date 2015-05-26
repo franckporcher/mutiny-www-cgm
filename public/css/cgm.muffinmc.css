@@ -381,6 +381,10 @@ td.MC.blob-line-code:first-of-type {
     color: rgb(  0, 180,   0);
     font-weight:    normal;
 }
+.MC.SC.tt_defvector { 
+    color: rgb(  0, 228,   0);
+    font-weight:    normal;
+}
 .MC.SC.tt_listval   { 
     color: rgb(  0, 228,  55);
     font-weight:    normal;
@@ -417,6 +421,10 @@ td.MC.blob-line-code:first-of-type {
     color: rgb(212,   0, 212);
     font-weight:    normal;
 }
+.MC.SC.tt_defun     { 
+    color: rgb(160,   0, 0);
+    font-weight:    normal;
+}
 .MC.SC.tt_pragma      { 
     color: rgb(128,   0, 128);
     font-weight:    normal;
@@ -451,9 +459,11 @@ td.MC.blob-line-code:first-of-type {
 .MC.SC.tt_getval:before    {content: "$(";}
 .MC.SC.tt_splitval:before  {content: "S(";}
 .MC.SC.tt_deflist:before   {content: "L(";}
+.MC.SC.tt_defvector:before {content: "V(";}
 .MC.SC.tt_listval:before   {content: "@(";}
 .MC.SC.tt_multseq:before   {content: "*(";}
 .MC.SC.tt_func:before      {content: "#(";}
+.MC.SC.tt_defun:before     {content: "F(";}
 .MC.SC.tt_iterator:before  {content: "I(";}
 .MC.SC.tt_lazy:before      {content: "Q(";}
 .MC.SC.tt_progn:before     {content: "P(";}
@@ -473,9 +483,11 @@ td.MC.blob-line-code:first-of-type {
 .MC.SC.tt_getval:after     {content: ")"; }
 .MC.SC.tt_splitval:after   {content: ")"; }
 .MC.SC.tt_deflist:after    {content: ")"; }
+.MC.SC.tt_defvector:after  {content: ")"; }
 .MC.SC.tt_listval:after    {content: ")"; }
 .MC.SC.tt_multseq:after    {content: ")"; }
 .MC.SC.tt_func:after       {content: ")"; }
+.MC.SC.tt_defun:after      {content: ")"; }
 .MC.SC.tt_iterator:after   {content: ")"; }
 .MC.SC.tt_lazy:after       {content: ")"; }
 .MC.SC.tt_progn:after      {content: ")"; }

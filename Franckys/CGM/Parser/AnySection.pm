@@ -474,6 +474,22 @@ sub generate_records {
     
     ##
     # PHASE II Evaluation :: Resolve late values (lazy) & iterators
+    #
+    # Tag records in their 1st field as followed :
+    #   - 0     => regular records
+    #   - 1     => 1st  of a declination serie
+    #   - 2     => 2nds in a declination serie
+    if (@final_records) {
+        if (@final_records == 1) {
+            $final_records[0][0] = [ 0 ];
+        }
+        else {
+            $final_records[0][0] = [ 1 ];
+            for (my $i = 1; $i < @final_records; $i++) {
+                $final_records[$i][0] = [ 2 ];
+            }
+        }
+    }
     trace("PHASE II GENERATION : ", scalar( @final_records ) . " final records", @final_records );
     foreach $record ( @final_records ) {
         for ($field_index = 0; $field_index < @$record; $field_index++) {
@@ -854,12 +870,11 @@ sub dump {
     my $self = shift;
     my $section_name = $self->name();
 
-    say
-        $self->dump_pre(),
-        $self->dump_name(),
-        $self->dump_headers(),
-        $self->dump_records(),
-        $self->dump_post();
+    say   $self->dump_pre();
+    say   $self->dump_name();
+    say   $self->dump_headers();
+          $self->dump_records();
+    say   $self->dump_post();
 }
 
 
@@ -968,11 +983,19 @@ sub dump_records {
 
     my @records = $self->records(); 
 
-    return
-        sprintf("<h2>Enregistrements (%d)</h2>\n", scalar(@records) ),
-        "<ol>\n",
-        ( map { sprintf("<li>%s</li>\n", $self->record_as_html($_)) } @records ),
-        "</ol>\n",
+    #return
+    #    sprintf("<h2>Enregistrements (%d)</h2>\n", scalar(@records) ),
+    #    "<ol>\n",
+    #    ( map { sprintf("<li>%s</li>\n", $self->record_as_html($_)) } @records ),
+    #    "</ol>\n",
+    #    "<br />\n",
+    #    ;
+    say  sprintf("<h2>Enregistrements (%d)</h2>\n", scalar(@records) ),
+        "<ol>\n";
+
+    say sprintf("<li>%s</li>\n", $self->record_as_html($_)) foreach @records;
+
+    say "</ol>\n",
         "<br />\n",
         ;
 }
@@ -986,8 +1009,8 @@ sub dump_post {
     my $self = shift;
     my $section_name = $self->name();
 
-    #return "\n<p>DUMP POST FROM: $self\n";
-    return ();
+    return "\n<p>DUMP POST FROM: $self\n";
+    #return ();
 }
 
 
@@ -1005,6 +1028,15 @@ sub record_as_html {
     } 0 .. (scalar(@$record) - 1);
     local $" = '</span><span>';
     "<span>@record_field_values</span>";
+}
+
+
+#----------------------------------------------------------------------------
+# KINTPV GenerationI/O 
+#----------------------------------------------------------------------------
+sub to_kintpv {
+    my ($self, $kintpvfd) = @_;
+    return (0, "ok");
 }
 
 
