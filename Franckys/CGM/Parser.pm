@@ -314,7 +314,7 @@ EOHTML
 # KINTPV GenerationI/O 
 #----------------------------------------------------------------------------
 sub to_kintpv {
-    my ($self, $outfn) = @_;
+    my ($self, $outfn, $version) = @_;
 
     my $nberr = $self->parsetree()->nb_errors();
     return (1, "$nberr erreurs! La génération KINTPV nécessite un fichier sans erreur. Opération annulée.")
@@ -323,7 +323,7 @@ sub to_kintpv {
     open my $kintpvfd, '>', $outfn
         or return (2, "Erreur à l'ouverture en écriture du fichier de sortie:[$outfn] ($!)");
 
-    my @cr = $self->parsetree()->to_kintpv($kintpvfd);
+    my @cr = $self->parsetree()->to_kintpv($kintpvfd, $version);
     close($kintpvfd);
     return @cr;
 }

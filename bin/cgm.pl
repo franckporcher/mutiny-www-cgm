@@ -140,7 +140,8 @@ my %option = (
     #   rgb     => [],
     #   define  => {},
     file        => '',
-    kintpv      => '',
+    k5          => '',
+    k6          => '',
     dump        => 0,
 );
 
@@ -158,7 +159,8 @@ GetOptions(
     },
     'd|dump!'       => \$option{dump},
     'f|file=s'      => \$option{file},
-    'k|kintpv=s'    => \$option{kintpv},
+    'k5=s'          => \$option{k5},
+    'k6=s'          => \$option{k6},
     #
     # REMINDER ;-)
     #
@@ -195,8 +197,15 @@ sub main {
             $parser->parse_file();
 
             # Generation
-            if ( $option{kintpv} ) {
-                my ($cr, $msg) = $parser->to_kintpv( $option{kintpv} );
+            if ( $option{k5} ) {
+                my ($cr, $msg) = $parser->to_kintpv( $option{k5}, 'v5' );
+
+                if ($cr) {
+                    print STDERR "[KINTPV Generation] $msg\n";
+                }
+            }
+            elsif ( $option{k6} ) {
+                my ($cr, $msg) = $parser->to_kintpv( $option{k6}, 'v6' );
 
                 if ($cr) {
                     print STDERR "[KINTPV Generation] $msg\n";

@@ -251,10 +251,10 @@ EOHTML
 # KINTPV GenerationI/O 
 #----------------------------------------------------------------------------
 sub to_kintpv {
-    my ($self, $kintpvfd) = @_;
+    my ($self, $kintpvfd, $version) = @_;
 
     foreach my $section ( $self->get_sections()) {
-        my ($cr, $msg) = $section->to_kintpv( $kintpvfd );
+        my ($cr, $msg) = $section->to_kintpv($kintpvfd, $version);
         return ($cr, $msg) if $cr;
     }
 

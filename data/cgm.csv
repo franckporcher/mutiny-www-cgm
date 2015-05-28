@@ -16,7 +16,7 @@ XTRA=1 500 XTRA=4 500 XTRA=6 1000|
 			|Categories.EstActif.Default|	|$(ZERO)|																		
 			|Categories.ParentID.Default|	|$(NIL)|																		
 			|Categories.EstRacine.Default|	|$(ZERO)|																		
-			|Categories.Description.Default|	|Q( "(@( #(categorie_short_description $("$(ROW).ID"))  2 1 3 4 5))) |																		
+			|Categories.Description.Default|	|Q( "(@( #(categories $("$(ROW).ID"))  2 1 3 4 5))) |																		
 			|Categories.OrdreEAN13.Default|	|3|																		
 			|Categories.DigitsEAN13.Default|	|3|																		
 																						
@@ -26,33 +26,36 @@ XTRA=1 500 XTRA=4 500 XTRA=6 1000|
 			|Produits.Nom.Default|	|NO NAME|																		
 			|Produits.Marque.Default|	|MUTINY TAHITI|																		
 			|Produits.Fournisseur.Default|	|KOKOLO|																		
-			|Produits.BasePrixHT.Default|	|Q( #(prix_base))|																		
-			|Produits.DeltaPrixHT.Default|	|Q( #(supplement_prix_base))|																		
-			|Produits.EAN13.Default|	|Q(  #(ean13 #(ean13_data)))|																		
+			|Produits.BasePrixHT.Default|	|Q( #(produit_prix_base))|																		
+			|Produits.DeltaPrixHT.Default|	|Q( #(produit_supplement_prix_base))|																		
+			|Produits.EAN13.Default|	|Q(  #(ean13 #(produit_ean13_data)))|																		
 			|Produits.Resume.Default|	|Q( "( !(:join-with $(CR))   #(resume_produit)))|																		
 																						
 		|Formules MuffinMC|																				
-			|categorie_short_description|	|'(    ?( $(#) #(self $("Categories.$(_1).ParentID"))) $("Categories.$(_1).Nom") ) |																		
+			|categories|	|F( ?( $(#) #(self $("Categories.$(_1).ParentID"))) $("Categories.$(_1).Nom") ) |																		
+			|categories_ids|	|F( ?( $(#) #(self $("Categories.$(_1).ParentID"))) $(_1)) |																		
+			|produit_top_categorie|	|F( @( #(categories $("$(ROW).CategorieID")) 1))|																		
+			|produit_sous_categorie|	|F( @( #(categories $("$(ROW).CategorieID")) 2))|																		
+			|produit_top_categorie_id|	|F( @( #(categories_ids $("$(ROW).CategorieID")) 1))|																		
 																						
-			|ean13_collection|	|'(  #(+ #(* $("Collections.$(_1).Type") 100) $("Collections.$(_1).Numero")) $("Collections.$(_1).L(Ordre Digits)EAN13"))|																		
-			|ean13_categorie|	|'($(_1) $("Categories.$(_1).L(Ordre Digits)EAN13")) |																		
-			|ean13_attribut|	|'(#(1- $(_2))  $("$(_1).L(Ordre Digits)EAN13"))|																		
-			|ean13_data|	|'( #(ean13_collection $("$(ROW).CollectionID"))     #(ean13_categorie $("$(ROW).CategorieID"))     #(map '( #(ean13_attribut S( !( :split-on =) _1)))  #(attributs))    )|																		
+			|ean13_collection|	|F(  #(+ #(* $("Collections.$(_1).Type") 100) $("Collections.$(_1).Numero")) $("Collections.$(_1).L(Ordre Digits)EAN13"))|																		
+			|ean13_categorie|	|F( $(_1) $("Categories.$(_1).L(Ordre Digits)EAN13")) |																		
+			|ean13_attribut|	|F( #(1- $(_2))  $("$(_1).L(Ordre Digits)EAN13") )|																		
+			|produit_ean13_data|	|F( #(ean13_collection $("$(ROW).CollectionID"))     #(ean13_categorie $("$(ROW).CategorieID"))     #(map '( #(ean13_attribut S( !( :split-on =) _1)))  #(attributs_produit))    )|																		
 																						
-						|Ex : FAB=4  MODEL=2  TH=3  CT=5  XTRA=5|																
-			|attributs|	|'( S("$(ROW).AttributsL(Fixes Declinaisons)") )|																		
-			|attribut|	|'( ~( !(:return-element) #(attributs) "$(_1)=*"))       |		|Ex : #(index_attribut FAB) → 4|																
-			|index_attribut|	|'( ~( #(attributs) "$(_1)=*" ))      |		|Ex : #(valeur_attribut FAB) → 100 % Coton|																
-			|valeur_attribut|	|'( @( $($(_1)) #(index_attribut $(_1)) ))       |		|Ex : #(valeur_attributs FAB=4  MODEL=2  TH=3  CT=5  XTRA=5) → 100 % Coton, Taste of Paradise, M, DEEP HEATHER, Ouverture Boutons|																
-			|valeur_attributs|	|'(  "( !( :join-with /) #(map valeur_attribut $(@)) )) |																		
+			|attributs_produit|	|F( S("$(ROW).AttributsL(Fixes Declinaisons)") )|			|Ex : #(attributs_produit) → FAB=4  MODEL=2  TH=3  CT=5  XTRA=5|															
+			|attribut_produit|	|F( ~( !(:return-element) #(attributs_produit) "$(_1)=*"))       |			|Ex : #(attribut_produit MODEL) → MODEL=2|															
+			|index_attribut_produit|	|F( ~( #(attributs_produit) "$(_1)=*" ))      |			|Ex : #(index_attribut_produit FAB) → 4|															
+			|valeur_attribut_produit|	|F( @( $($(_1)) #(index_attribut_produit $(_1)) ))       |			|Ex : #(valeur_attribut_produit FAB) → 100 % Coton|															
+			|valeur_attributs_produit|	|F(  "( !( :join-with /) #(map valeur_attribut_produit $(@)) )) |																		
+			|produit_attribut_genre_id|	|F( #(1+ #(produit_top_categorie_id)))|																		
+			|resume_produit|	|F( "Collection "( !(:quote) $("Collections.$("$(ROW).CollectionID").Nom")) – #(valeur_attribut_produit MODEL)"  "$("Categories.$("$(ROW).CategorieID").Description") - #(valeur_attribut_produit XTRA)" #(valeur_attribut_produit FAB)  #(valeur_attributs_produit TH TF TE CT) ) |																		
 																						
-			|resume_produit|	|'( "Collection "( !(:quote) $("Collections.$("$(ROW).CollectionID").Nom")) – #(valeur_attribut MODEL)"  "$("Categories.$("$(ROW).CategorieID").Description") - #(valeur_attribut XTRA)" #(valeur_attribut FAB)  #(valeur_attributs TH TF TE CT) ) |																		
+			|produit_prix_base|	|F( P( =(Cat A(CAT= #(categories_ids $("$(ROW).CategorieID"))))   #(+ #(assoc L( $(Cat) "COL=$("$(ROW).CollectionID")" "#(attribut_produit FAB)/$(Cat)") $(Liste_Prix_Base)))  )) |																		
+			|produit_supplement_prix_base|	|F( #(+ #(assoc #(attributs_produit) $(Liste_Supplements_Prix))) )|																		
 																						
-			|categorie_ids|	|'( ?( $(#) #(self $("Categories.$(_1).ParentID"))) $(_1)) |																		
-			|prix_base|	|'( P( =(Cat A(CAT= #(categorie_ids $("$(ROW).CategorieID"))))   #(+ #(assoc L( $(Cat) "COL=$("$(ROW).CollectionID")" "#(attribut FAB)/$(Cat)") $(Liste_Prix_Base)))  )) |																		
-			|supplement_prix_base|	|'( #(+ #(assoc #(attributs) $(Liste_Supplements_Prix))) )|																		
+			|show|	|F("$(#) arguments : ("(!(:join-with ")(") $(@)))")|																		
 																						
-			|show|	|'(  "$(#) => ,("( !( :join-with ",),("  )$(@)),)")|																		
 																						
 		|Equivalence CGM <> KINTPV|																				
 			|KINTPV.Code_Barre|	|EAN13|																		
@@ -62,9 +65,16 @@ XTRA=1 500 XTRA=4 500 XTRA=6 1000|
 			|KINTPV.Description|	|Resume|																		
 			|KINTPV.PrixVente_TTC|	|BasePrixHT DeltaPrixHT|																		
 			|KINTPV.QteEnStock|	|Stock|																		
-			|KINTPV.EAN13_Master_On|	|CT 1|	|Ne pas modifier ce libellé |																	
-			|KINTPV.TVA|	|16|																		
+			|KINTPV.Categorie_ID|	|CategorieID|																		
+			|KINTPV.Collection_ID|	|CollectionID|																		
+			|KINTPV.Attributs_Declinaisons|	|AttributsDeclinaisons|																		
+			|KINTPV.Attributs_Fixes|	|AttributsFixes|																		
 																						
+			|KINTPV.Attr_Genre|	|GENRE|	|Ne pas modifier ce libellé |																	
+			|KINTPV.Attr_Couleur|	|CT|																		
+			|KINTPV.Attr_EAN13_Master|	|CT 1|																		
+																						
+			|KINTPV.TVA|	|16|																		
 |Aliases|		|Classe|	|Nom|	|Valeur|	|Comment|																	
 																						
 |Collections|		|ID*|	|Nom*|	|Type*|	|Numero*|	|Store*|	|DateLancement*|	|OrdreEAN13*|	|DigitsEAN13*|													
@@ -132,17 +142,18 @@ XTRA=1 500 XTRA=4 500 XTRA=6 1000|
 |Attributs|		|ID*|	|Code*|	|Nom*|	|OrdreEAN13*|	|DigitsEAN13*|	|Type*|	|Valeurs*|														
 		|1|	|MODEL|	|Modèle|	|6|	|1|		|"Save The Whales" "Taste Of Paradise" "Washing Machine" "Stars Lovers" "Spirit Of Pacific" "Custom Your Life" "Polo 89" Teahupoo "Matavai Bay" "Ship Of Freedom" "Enjoy Coconuts" Vespa Kalachnikov|														
 		|2|	|XTRA|	|Extras|	|7|	|1|		|Capuche "Dos-nageur" Bretelles "Ouverture zippée" "Ouverture boutons" "Maille piquée"|														
-		|3|	|FAB|	|Composition|	|8|	|1|		|Cuir Daim Soie "100 % Coton" Laine Elasthane Paille Polyester Viscose|														
-		|4|	|TH|	|"Taille Homme"|	|9|	|1|		|XS S M L XL XXL 52 54 56 58|														
-		|5|	|TF|	|"Taille Femme"|	|9|	|1|		|XS S M L XL XXL 52 54 56 58|														
-		|6|	|TE|	|"Taille Enfant"|	|9|	|1|		|1A 2A 3A 4A 5A 6A 8A 10A 12A 14A|														
-		|7|	|CT|	|"Couleur/Texture"|	|10|	|2|		|FAKE "HEATHER TAN" "HEATHER NAVY" "HEATHER BROWN" "DEEP HEATHER" BROWN NAVY OLIVE ASPHALTE MIDNIGHT "LIGHT BLUE/GREY" BROWN/TAN "CANVAS RED/GREY" KHAKI "SKY BLUE" PURPLE "DARK GREY" "USED VIOLET" "SPORT GREY" SAND "USED RASPBERRY"|														
+		|3|	|FAB|	|Composition|	|8|	|1|		|Cuir Daim "Pure Soie" "100% Coton" Laine Elasthane Paille Polyester Viscose|														
+		|4|	|TH|	|Taille|	|9|	|1|		|XS S M L XL XXL 52 54 56 58|														
+		|5|	|TF|	|Taille|	|9|	|1|		|XS S M L XL XXL 52 54 56 58|														
+		|6|	|TE|	|Taille|	|9|	|1|		|1A 2A 3A 4A 5A 6A 8A 10A 12A 14A|														
+		|7|	|CT|	|Couleur_Texture|	|10|	|2|		|FAKE "HEATHER TAN" "HEATHER NAVY" "HEATHER BROWN" "DEEP HEATHER" BROWN NAVY OLIVE ASPHALTE MIDNIGHT "LIGHT BLUE/GREY" BROWN/TAN "CANVAS RED/GREY" KHAKI "SKY BLUE" PURPLE "DARK GREY" "USED VIOLET" "SPORT GREY" SAND "USED RASPBERRY"|														
+		|8|	|GENRE|	|Genre|	|$(ZERO)|	|$(ZERO)|		|#(map   '($("Categories[$(_1)].Nom"))  #(grep F( #(< $("Categories[$(_1)].ID") 10)) #(.. 1 $(Categories.#))))|														
 																						
 |Produits|	|Op*|	|CollectionID*|	|CategorieID*+|	|AttributsFixes|	|AttributsDeclinaisons+|	|Nom*|	|Marque*|	|Fournisseur*|	|BasePrixHT*|	|DeltaPrixHT*|	|BasePoids*|	|DeltaPoids*|	|Stock*|	|EAN13*|	|LxPxH|	|Resume*|	|Description*|	|BaliseTitre|	|MotsCles|	|MetaDescr|	|URLSimple|	|URLImage*|
-		|2|	|220 222 224|	|FAB=3|	|"A(MODEL= 3 4)  A(TH= 3 4 5)  A(CT= 5 6 7)   A(XTRA= 4 5 6)"|	|"Chemise homme Soie"|					|Poids|	|Delta-Poids|	|Stock |				|Description|					|URLImage|
+		|2|	|220 222 224|	|Q(  "FAB=3 GENRE=#(produit_attribut_genre_id)"  )|	|"A(MODEL= 3 4)  A(TH= 3 4 5)  A(CT= 5 6 7)   A(XTRA= 4 5 6)"|	|"Chemise pure soie"|					|$(ZERO)|	|$(ZERO)|	|10|				|Description|					|URLImage|
 																						
 |Lookup|			|Expression |	|Valeur|																		
-			|$(MODEL)|																			
+			|$(MODEL)|		|Q("Genre=#(1+ #(produit_top_categorie_id))")   FAB=3|																	
 			|$(MODEL[1])|																			
 			|$(MODEL[2])|																			
 			|$(MODEL[3])|																			

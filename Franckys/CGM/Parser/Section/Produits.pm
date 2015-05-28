@@ -39,6 +39,7 @@ use Const::Fast;
 # use Regexp::Common;
 # use Path::Class
 use Franckys::MuffinMC;
+use Franckys::Trace;
 
 #----------------------------------------------------------------------------
 # UTF8 STUFF
@@ -84,7 +85,12 @@ my $KINTPVFD;
 my $record;
 my $record_tag;         # regular(0)  master(1)  declination(2)
 my $master_ean13;
+my $decli_ean13;
 my @output_record;
+my $RN;
+my $ROW;
+my $V5 = 0;
+my $V6 = 0;
 
 #----------------------------------------------------------------------------
 # Generic Getters (overload at your own risk)
@@ -130,99 +136,98 @@ sub need_eval { 1 };
 # KINTPV Generation Template
 #----------------------------------------------------------------------------
 my %kintpv_template = (
-    Code_Barre
+    # 1. V5/V6 - Déclinaison => Référence Master   (== code_barre principal)
+    #            Regular     => Référence produit  (== code_barre produit)
+    Reference_Article
         => sub { 
                 if ( $record_tag eq 'regular') {
                     return value_ktpv_field('Code_Barre')
                 }
                 else {
                     # Compute Master-EAN13 for all products from the declination 
-                    ($master_ean13)
-                        = get_muffin_eval( sprintf('#(ean13_master %s)', value_ktpv_field('Code_Barre')))
-                        if $record_tag eq 'master';
+                    # as a unique reference
+                    $master_ean13
+                        = get_muffin_eval_final( sprintf('#(_ean13_master %s)', value_ktpv_field('Code_Barre')))
+                            if $record_tag eq 'master';
 
                     return defined $master_ean13 ? $master_ean13 : '';
                 }
            },
 
-    Code_Barre_Decli
-        => sub { 
-                return $record_tag eq 'regular'
-                       ? '' 
-                       : return value_ktpv_field('Code_Barre')
-                       ;
-           },
-
-    Reference_Article
+    # 2. V5. Code Barre Produit (master ou déclinaison)
+    #    V6. Reference_Article (master ou déclinaison)
+    Code_Barre
         => sub {
-                return $output_record[0];
+                return 
+                    $V5 
+                       ? value_ktpv_field('Code_Barre')
+                       : $output_record[0];
            },
 
-    Ref_Decli
-        => sub { 
-                return $output_record[1];
-           },
-    
-    # Catégorie parente               
+
+    # 3. Top Catégorie
     Type_Article
         => sub {
-                my ($top_categorie)
-                    = get_muffin_eval(
-                        sprintf( '#(top_categorie %s)',
-                                 value_field('CategorieID'),
-                      ));
-                return defined $top_categorie ? $top_categorie : '';
+                return get_muffin_eval_final( '#(produit_top_categorie)' );
            },
     
+    # 4. Nom du produit
     Nom_Article                 
         => sub {
                 return value_ktpv_field('Nom_Article');
            },
 
-    # (Critère 8) Sous-Catégorie - Niveau 2              
+    # 5. Sous-Catégorie (Critère 8) - Niveau 2 des catégories
     Dominant
         => sub {
-                my ($sous_categorie)
-                    = get_muffin_eval(
-                        sprintf( '#(sous_categorie %s)',
-                                 value_field('CategorieID'),
-                      ));
-                return defined $sous_categorie ? $sous_categorie : '';
+                return get_muffin_eval_final( '#(produit_sous_categorie)' );
            },
 
-    # (Critère 9) Nom de la collection
+    # 6. Nom de la collection dans (Critère 9)
     Saison
         => sub {
-                my ($collection_name)
-                    = get_muffin_eval(
-                        sprintf( '$("Collections.%s.Nom")',
-                                 value_field('CollectionID'),
+                return get_muffin_var_final(
+                        sprintf( 'Collections.%s.Nom',
+                                 value_ktpv_field('Collection_ID'),
                       ));
-                return defined $collection_name ? $collection_name : '';
            },
     
-    # (Critère 10) Attribut "Genre" ssi attribut fixe, autrement laisser blanc
-    Genre                       => sub { 'Genre' },
+    # 7. Attribut *fixe* "Genre" dans (Critère 10). Vide si n'existe pas
+    Genre
+        => sub {
+                my $genre_attrname = get_muffin_var_final('KINTPV.Attr_Genre');
+                return get_muffin_eval_final( "#(_ktpv_value_attr_fixe $genre_attrname)" );
+           },
     
-    # (Critère 11) Attributs fixes qui soient ni 'genre', ni 'couleur'
-    Famille                     => sub { 'Famille' },
+    # 8. Attribut *fixes* autre que "Genre" et "Couleur" dans (Critère 11). Vide si n'existe pas
+    Famille                     
+        => sub { '' },
     
-    # (Critère 12) Attribut "Couleur/Texture" ssi attribut fixe, autrement laisser blanc
-    Couleur                     => sub { 'Couleur' },
+    # 9. Attribut *fixe* "Couleur/Texture" dans (Critère 12). Vide si n'existe pas
+    Couleur
+        => sub {
+                my $couleur_attrname = get_muffin_var_final('KINTPV.Attr_Couleur');
+                return $couleur_attrname 
+                    ?  get_muffin_eval_final( "#(_ktpv_value_attr_fixe $couleur_attrname)" )
+                    : $couleur_attrname
+                    ;
+           },
     
-    # (Critère 7)
+    # 10. Marque (Critère 7)
     Marque
         => sub {
                 return value_ktpv_field('Marque');
            },
     
+    # 11. Nom du fournisseur
     Nom_Fournisseur
         => sub { return value_ktpv_field('Nom_Fournisseur') },
         # Ref_Fournisseur
         # Designation1_Fournisseur
         # Designation2_Fournisseur
     
-    # Résumé
+    # 12. V5 - Description du produit ou déclinaison
+    #     V6 - Description du produit doit être invariante par déclinaison PB!!!
     Description
         => sub {
                 return value_ktpv_field('Description');
@@ -232,20 +237,24 @@ my %kintpv_template = (
         # PublierSurWeb_0_1       => sub { return 0 },
         # Poids                   => sub { return 0 },
     
-    # AttributsDeclinaisons
-    Declinaison                 => sub { 'Declinaisons' },
+    # 13. Spécification de la déclinaison du produit
+    Declinaison
+        => sub {
+                return get_muffin_eval_final( '#(_ktpv_declinaison)' );
+           },
         # PrixAchat_HT
         # RemisePourcent_PrixAchat
         # FraisApproche_PrixAchat_HT
         # PrixValoStock_PrixAchat_HT	
         # DateApplication_PrixAchat	
     
+    # 14. Taux TVA
     TauxTaxe_TVA
         => sub {
-                my ($tva) = get_muffin_var('KINTPV.TVA');
-                return defined $tva ? $tva : 0;
+                return get_muffin_var_final('KINTPV.TVA');
            },
     
+    # 15. Prix vente TTC
     PrixVente_TTC
         => sub { 
                 my (@prix) = values_ktpv_field('PrixVente_TTC');
@@ -254,20 +263,38 @@ my %kintpv_template = (
                 return $prix;
            },
     
+    # 16. Date application du prix de vente TTC
     DateApplication_PrixVente
         => sub {
-                my ($ktpv_date)
-                    = get_muffin_eval(
-                        sprintf( '#(ktpv_date $("Collections.%s.DateLancement"))',
-                                 value_field('CollectionID'),
+                return get_muffin_eval_final(
+                        sprintf( '#(_ktpv_date $("Collections.%s.DateLancement"))',
+                                 value_ktpv_field('Collection_ID'),
                       ));
-                return defined $ktpv_date ? $ktpv_date : '';
            },
     
+    # 17. Entrée en stock
     QteEnStock
         => sub {
                 return value_ktpv_field('QteEnStock');
            },
+
+    # 18. V6_ONLY - Référence Déclinaison Produit (== code_barre déclinaison, si déclinaison, autrement vide)
+    Ref_Decli
+        => sub { 
+                $decli_ean13
+                    =  $record_tag eq 'regular'
+                       ? '' 
+                       : value_ktpv_field('Code_Barre')
+                       ;
+                return  $decli_ean13;
+           },
+    
+    # 19. V6_ONLY - Code Barre Déclinaison Produit (si déclinaison, autrement vide)
+    Code_Barre_Decli
+        => sub { 
+                return  $decli_ean13;
+           },
+
 
         # CmdAuto_StockMini	
         # CmdAuto_Colisage	
@@ -291,51 +318,105 @@ my %kintpv_template = (
         # IdExterne
 );
 
-my @kintpv_fields = (qw(
-    Code_Barre
-    Code_Barre_Decli
-    Reference_Article
-    Ref_Decli
-    Type_Article
-    Nom_Article
-    Dominant
-    Saison
-    Genre
-    Famille
-    Couleur
-    Marque
-    Nom_Fournisseur
-    Description
-    Declinaison
-    TauxTaxe_TVA
-    PrixVente_TTC
-    DateApplication_PrixVente
-    QteEnStock
-));
+my @kintpv_fields = ();
+
 
 #----------------------------------------------------------------------------
-# KINTPV GenerationI/O 
+# KINTPV Generation
 #----------------------------------------------------------------------------
 sub to_kintpv {
-    my ($self, $kintpvfd) = @_;
+    my ($self, $kintpvfd, $k_version) = @_;
 
     # Publish important data
+    $V5           = $k_version eq 'v5';
+    $V6           = $k_version eq 'v6';
     $section      = $self;
     $section_name = $self->name();
     $KINTPVFD     = $kintpvfd;
+
+    # Fields
+    @kintpv_fields
+    = $V5
+        ## KINTPV V5 ##
+        ? (qw(
+            Reference_Article
+            Code_Barre
+            Type_Article
+            Nom_Article
+            Dominant
+            Saison
+            Genre
+            Famille
+            Couleur
+            Marque
+            Nom_Fournisseur
+            Description
+            Declinaison
+            TauxTaxe_TVA
+            PrixVente_TTC
+            DateApplication_PrixVente
+            QteEnStock
+        ))
+        ## KINTPV V6 ##
+        : (qw(
+            Reference_Article
+            Code_Barre
+            Type_Article
+            Nom_Article
+            Dominant
+            Saison
+            Genre
+            Famille
+            Couleur
+            Marque
+            Nom_Fournisseur
+            Description
+            Declinaison
+            TauxTaxe_TVA
+            PrixVente_TTC
+            DateApplication_PrixVente
+            QteEnStock
+            Ref_Decli
+            Code_Barre_Decli
+        ))
+        ;
 
     # Generate Headers
     $self->kintpv_headers();
 
     # Muffin Formulas
-    get_muffin_eval( $_ )
+    _muffin_eval( $_ )
         foreach (
             '=(*
-                ktpv_date       F( "!(!:cp :join-with /)@(~($(_1) (..,)) 4 3 2)" )
-                ean13_master    F( #(rean13 $(_1) #(ean13_attribut $(KINTPV.EAN13_Master_On))))
-                top_categorie   F( @( #(categorie_short_description $(_1)) 1 ) )
-                sous_categorie  F( @( #(categorie_short_description $(_1)) 2 ) )
+                _ktpv_date               F( "!(!:cp :join-with /)@(~($(_1) (..,)) 4 3 2)" )
+                _ean13_master            F( #(rean13 $(_1) #(ean13_attribut $(KINTPV.Attr_EAN13_Master))))
+                _attributs_declinaison   F( S("$(ROW).$(KINTPV.Attributs_Declinaisons)") )
+                _attributs_fixes         F( S("$(ROW).$(KINTPV.Attributs_Fixes)") )
+            )',
+
+            # (_ktpv_declinaison)  "MODEL=2 TH=3 CT=4"  -->  "Modèle=Mutiny Sport:Taille=Large:Couleur_Testure=Bleu"
+            '=(*
+                _ktpv_declinaison        F( "( !(:join-with :)  
+                                               #( !(:by 2) 
+                                                  map 
+                                                     F( "$("$(_1).Nom")=$("$(_1)[$(_2)]")"       )  
+                                                     S( !(:split-on =) #(_attributs_declinaison) )
+                                                )
+                                              )
+                                           )
              )',
+
+            # (_ktpv_value_attr_fixe  GENRE) -> $(GENRE[3]) -> Homme
+            '=(*
+                _ktpv_value_attr_fixe       F( $("$(_1)["~( !(:match-first) #(_attributs_fixes) "$(_1)=*")"]") )
+             )',
+
+            '=(*
+                _ktpv_value_attr_fixe       F( $("$(_1)["~( !(:match-first) #(_attributs_fixes) "$(_1)=*")"]") )
+                _ktpv_value_attr_fixe       F( "$(_1)[~( !(:match-first) #(_attributs_fixes) "$(_1)=*")]" )
+                _ktpv_value_attr_fixe       F( $("$(_1)[~( !(:match-first) #(_attributs_fixes) "$(_1)=*")]") )
+             )',
+
         );
 
     # Generate Records
@@ -345,21 +426,30 @@ sub to_kintpv {
     return (0, "ok");
 }
 
-###
-# SECTION HEADERS
+##
+# GENERATE SECTION HEADERS
 #
 # $section->kintpv_headers();
+#
 sub kintpv_headers {
     kintpv_output_record( @kintpv_fields );
 }
 
-
-###
-# SECTION RECORDS
+##
+# GENERATE SECTION RECORDS
 #
 # $section->kintpv_records();
+#
 sub kintpv_records {
     my $self = shift;
+
+    # Install Muffin indexes
+    # Allows to use taditional Muffin vars, like RN, ROW, FN, SN
+    # (be warned that Field indexes are not kept : FN CELL)
+    $RN         = 1;
+    $ROW        = "${section_name}[$RN]";
+    muffin_setvar( RN  => sub { return [ $RN  ] } );
+    muffin_setvar( ROW => sub { return [ $ROW ] } );
 
     foreach my $r ( $self->records() ) {
         $record        = $r;
@@ -371,45 +461,59 @@ sub kintpv_records {
             ;
 
         foreach my $f ( @kintpv_fields ) {
-            my $value = $kintpv_template{$f}();
+            my $value 
+                = exists $kintpv_template{$f}
+                    ?  $kintpv_template{$f}()
+                    :  'NO_GENPROC_FOR_FIELD_${f}'
+                    ;
             push @output_record, ( defined $value ? $value : '');
         }
 
         kintpv_output_record( @output_record );
+
+        # Keep muffin indexes updated
+        $RN++;
+        $ROW = "${section_name}[$RN]";
     }
-
 }
 
 
-###
-sub record_as_html {
-    my ($self, $record) = @_;
-
-    my @record_field_values = map {
-        my $final = $self->get_record_final_value($record, $_);
-
-          $#$final == -1  ? ''
-        : $#$final == 0   ? $final->[0]
-        :                   sprintf('(%s)', (join ')(', @{$final}))
-        ;
-    } 0 .. (scalar(@$record) - 1);
-    local $" = '</span><span>';
-    "<span>@record_field_values</span>";
+#----------------------------------------------------------------------------
+# KINTPV MuffinMC Helpers
+#----------------------------------------------------------------------------
+sub _muffin_setvar {
+    my ($varname, @values) = @_;
+    return  muffin_setvar($varname, \@values);
 }
 
-#----------------------------------------------------------------------------
-# KINTPV Generation Helpers
-#----------------------------------------------------------------------------
-sub get_muffin_var {
+
+sub _muffin_getval {
     my ($varname) = @_;
+    return  muffin_getval($varname, $section);
+}
 
-    return clean_muffin_stuff( muffin_getval($varname) );
+sub get_muffin_var {
+    return clean_muffin_stuff( _muffin_getval(@_) );
+}
+
+sub get_muffin_var_final {
+    my @final = get_muffin_var(@_);
+    "@final";
+}
+
+
+sub _muffin_eval {
+    my ($prog) = @_;
+    return  muffin_eval($prog, $section);
 }
 
 sub get_muffin_eval {
-    my ($prog) = @_;
+    return clean_muffin_stuff( _muffin_eval(@_) );
+}
 
-    return clean_muffin_stuff( muffin_eval($prog) );
+sub get_muffin_eval_final {
+    my @final = get_muffin_eval(@_);
+    "@final";
 }
 
 
@@ -427,25 +531,9 @@ sub clean_muffin_stuff {
 # Extract the final value of a ktpv-indirect-named-field of the record,
 #
 sub value_ktpv_field {
-    my ($ktpv_field) = @_;
-
-    # Get the section field name
-    my @section_field_names = get_muffin_var("KINTPV.${ktpv_field}");
-    return '' unless @section_field_names;
-
-    # Get the muffin index associated with the muffin section field name
-    my @muffin_indexes = map { get_muffin_var("${section_name}.${_}.index") } @section_field_names;
-
-    # Extract the field values
-    my @muffin_values
-        =  map {
-                my $final = $section->get_record_final_value($record, $_ - 1);
-                  $#$final == -1  ? ''
-                : $#$final == 0   ? $final->[0]
-                : @{$final}
-           } @muffin_indexes;
-
-    return "@muffin_values";
+    my $ktpv_field = shift;
+    my @final = values_ktpv_field($ktpv_field);
+    return "@final";
 }
 
 ##
@@ -454,82 +542,41 @@ sub value_ktpv_field {
 # Extract the final values of a ktpv-indirect-named-field of the record,
 #
 sub values_ktpv_field {
-    my ($ktpv_field) = @_;
+    my $ktpv_field = shift;
 
     # Get the section field name
     my @section_field_names = get_muffin_var("KINTPV.${ktpv_field}");
     return '' unless @section_field_names;
 
-    # Get the muffin index associated with the muffin section field name
-    my @muffin_indexes = map { get_muffin_var("${section_name}.${_}.index") } @section_field_names;
-
-    # Extract the field values
-    my @muffin_values
-        =  map {
-                my $final = $section->get_record_final_value($record, $_ - 1);
-                  $#$final == -1  ? ''
-                : $#$final == 0   ? $final->[0]
-                : @{$final}
-           } @muffin_indexes;
-
-    return @muffin_values;
+    # Extract the values from the record's fieldnames
+    return map { values_field($_) } @section_field_names;
 }
 
 ##
-# my $value_str = value_field( FIELDNAME )
+# my $final_value_str = value_field( FIELDNAME )
 #
 # Extract the final value of a named-field of the record,
 #
 sub value_field {
-    my ($field) = @_;
-
-    # Get the muffin index associated with the muffin section field name
-    my ($muffin_index) = get_muffin_var("${section_name}.${field}.index");
-
-    # Extract the field values
-    if ( defined $muffin_index ) {
-        my $final  = $section->get_record_final_value($record, $muffin_index - 1);
-        my @muffin_values
-            = $#$final == -1  ? ''
-            : $#$final == 0   ? $final->[0]
-            : @{$final}
-            ;
-        return "@muffin_values";
-    }
-    else {
-        return '';
-    }
+    my $fieldname = shift;
+    my @final = values_field( $fieldname );
+    return "@final";
 }
 
 ##
-# my @values = values_field( FIELDNAME )
+# my @final_values = values_field( FIELDNAME )
 #
 # Extract the final values of a named-field of the record,
 #
 sub values_field {
-    my ($field) = @_;
-
-    # Get the muffin index associated with the muffin section field name
-    my ($muffin_index) = get_muffin_var("${section_name}.${field}.index");
-
-    # Extract the field values
-    if ( defined $muffin_index ) {
-        my $final  = $section->get_record_final_value($record, $muffin_index - 1);
-        my @muffin_values
-            = $#$final == -1  ? ''
-            : $#$final == 0   ? $final->[0]
-            : @{$final}
-            ;
-        return @muffin_values;
-    }
-    else {
-        return ();
-    }
+    my $fieldname = shift;
+    return get_muffin_var("${ROW}.${fieldname}");
 }
 
-###
-# OUTPUT RECORD
-#
+
+#----------------------------------------------------------------------------
+# KINTPV IO Helpers
+#----------------------------------------------------------------------------
 sub kintpv_output_record {
     my @record
         = map { 

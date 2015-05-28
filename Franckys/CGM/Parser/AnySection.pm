@@ -816,6 +816,7 @@ sub set_muffin_recordfield_variables {
 #
 # Sets the following MuffinMC variables
 #   <Section>[RN + 1] <- $record
+#   <Section>.#       <- RN+1
 #
 sub set_muffin_record_variable {
     my ($self, $record) = @_;
@@ -828,6 +829,14 @@ sub set_muffin_record_variable {
                  $self->nb_records() + 1,
         ),
         $record,
+    );
+
+    # <Section>.# <- RN + 1
+    $self->set_muffin_variable(
+        sprintf( '%s.#',
+                 $self->name(),
+        ),
+        [ $self->nb_records() + 1 ],
     );
     traceout();
 }
@@ -1009,8 +1018,8 @@ sub dump_post {
     my $self = shift;
     my $section_name = $self->name();
 
-    return "\n<p>DUMP POST FROM: $self\n";
-    #return ();
+    #return "\n<p>DUMP POST FROM: $self\n";
+    return ();
 }
 
 
@@ -1035,7 +1044,7 @@ sub record_as_html {
 # KINTPV GenerationI/O 
 #----------------------------------------------------------------------------
 sub to_kintpv {
-    my ($self, $kintpvfd) = @_;
+    my ($self, $kintpvfd, $version) = @_;
     return (0, "ok");
 }
 
