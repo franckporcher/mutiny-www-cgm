@@ -1,170 +1,185 @@
-|Variables|		|Classe|	|Nom|	|Valeur|	|Comment|																	
-		|Objets communs|			|Variables générales définies par Mutiny|																	
-			|Common.Stores|	|PPT  World|																		
+|Variables|		|Classe|	|Nom|	|Valeur|	|Comment|																					
+		|Objets communs|			|Variables générales définies par Mutiny|																					
+			|Common.Stores|	|PPT  World|																						
 			|Liste_Prix_Base|	|CAT=20 3000 CAT=21 3500 CAT=22 5000 
 COL=1 +100 COL=2 +200
 FAB=3/CAT=20 +2000 FAB=3/CAT=3000 +200 FAB=3/CAT=22 +7000
-FAB=4/CAT=20 +100 FAB=4/CAT=21 +200 FAB=4/CAT=22 +500|																		
+FAB=4/CAT=20 +100 FAB=4/CAT=21 +200 FAB=4/CAT=22 +500|																						
 			|Liste_Supplements_Prix|	|TH=4 300 TH=5 500 TH=6 700
-XTRA=1 500 XTRA=4 500 XTRA=6 1000|																		
-																						
-		|Valeurs des champs par défaut|			|Les champs obligatoires sont marqués par * dans l'entête de la colonne pour la section. Les champs non positionnés utiliseront les valeurs par défaut définies ci-dessous. |																	
-			|Collections.Store.Default|	|$(Common.Stores)|																		
-			|Collections.OrdreEAN13.Default|	|$(ZERO)|																		
-			|Collections.DigitsEAN13.Default|	|3|																		
-																						
-			|Categories.EstActif.Default|	|$(ZERO)|																		
-			|Categories.ParentID.Default|	|$(NIL)|																		
-			|Categories.EstRacine.Default|	|$(ZERO)|																		
-			|Categories.Description.Default|	|Q( "(@( #(categories $("$(ROW).ID"))  2 1 3 4 5))) |																		
-			|Categories.OrdreEAN13.Default|	|3|																		
-			|Categories.DigitsEAN13.Default|	|3|																		
-																						
-			|Attributs.Type.Default|	|select|		|Other values are : "color" et radio-buttons (what is the code for prestashop)|																
-																						
-			|Produits.Op.Default|	|CREA|																		
-			|Produits.Nom.Default|	|NO NAME|																		
-			|Produits.Marque.Default|	|MUTINY TAHITI|																		
-			|Produits.Fournisseur.Default|	|KOKOLO|																		
-			|Produits.BasePrixHT.Default|	|Q( #(produit_prix_base))|																		
-			|Produits.DeltaPrixHT.Default|	|Q( #(produit_supplement_prix_base))|																		
-			|Produits.EAN13.Default|	|Q(  #(ean13 #(produit_ean13_data)))|																		
-			|Produits.Resume.Default|	|Q( "( !(:join-with $(CR))   #(resume_produit)))|																		
-																						
-		|Formules MuffinMC|																				
-			|categories|	|F( ?( $(#) #(self $("Categories.$(_1).ParentID"))) $("Categories.$(_1).Nom") ) |																		
-			|categories_ids|	|F( ?( $(#) #(self $("Categories.$(_1).ParentID"))) $(_1)) |																		
-			|produit_top_categorie|	|F( @( #(categories $("$(ROW).CategorieID")) 1))|																		
-			|produit_sous_categorie|	|F( @( #(categories $("$(ROW).CategorieID")) 2))|																		
-			|produit_top_categorie_id|	|F( @( #(categories_ids $("$(ROW).CategorieID")) 1))|																		
-																						
-			|ean13_collection|	|F(  #(+ #(* $("Collections.$(_1).Type") 100) $("Collections.$(_1).Numero")) $("Collections.$(_1).L(Ordre Digits)EAN13"))|																		
-			|ean13_categorie|	|F( $(_1) $("Categories.$(_1).L(Ordre Digits)EAN13")) |																		
-			|ean13_attribut|	|F( #(1- $(_2))  $("$(_1).L(Ordre Digits)EAN13") )|																		
-			|produit_ean13_data|	|F( #(ean13_collection $("$(ROW).CollectionID"))     #(ean13_categorie $("$(ROW).CategorieID"))     #(map '( #(ean13_attribut S( !( :split-on =) _1)))  #(attributs_produit))    )|																		
-																						
-			|attributs_produit|	|F( S("$(ROW).AttributsL(Fixes Declinaisons)") )|			|Ex : #(attributs_produit) → FAB=4  MODEL=2  TH=3  CT=5  XTRA=5|															
-			|attribut_produit|	|F( ~( !(:return-element) #(attributs_produit) "$(_1)=*"))       |			|Ex : #(attribut_produit MODEL) → MODEL=2|															
-			|index_attribut_produit|	|F( ~( #(attributs_produit) "$(_1)=*" ))      |			|Ex : #(index_attribut_produit FAB) → 4|															
-			|valeur_attribut_produit|	|F( @( $($(_1)) #(index_attribut_produit $(_1)) ))       |			|Ex : #(valeur_attribut_produit FAB) → 100 % Coton|															
-			|valeur_attributs_produit|	|F(  "( !( :join-with /) #(map valeur_attribut_produit $(@)) )) |																		
-			|produit_attribut_genre_id|	|F( #(1+ #(produit_top_categorie_id)))|																		
-			|resume_produit|	|F( "Collection "( !(:quote) $("Collections.$("$(ROW).CollectionID").Nom")) – #(valeur_attribut_produit MODEL)"  "$("Categories.$("$(ROW).CategorieID").Description") - #(valeur_attribut_produit XTRA)" #(valeur_attribut_produit FAB)  #(valeur_attributs_produit TH TF TE CT) ) |																		
-																						
-			|produit_prix_base|	|F( P( =(Cat A(CAT= #(categories_ids $("$(ROW).CategorieID"))))   #(+ #(assoc L( $(Cat) "COL=$("$(ROW).CollectionID")" "#(attribut_produit FAB)/$(Cat)") $(Liste_Prix_Base)))  )) |																		
-			|produit_supplement_prix_base|	|F( #(+ #(assoc #(attributs_produit) $(Liste_Supplements_Prix))) )|																		
-																						
-			|show|	|F("$(#) arguments : ("(!(:join-with ")(") $(@)))")|																		
-																						
-																						
-		|Equivalence CGM <> KINTPV|																				
-			|KINTPV.Code_Barre|	|EAN13|																		
-			|KINTPV.Nom_Article|	|Nom|																		
-			|KINTPV.Marque|	|Marque|																		
-			|KINTPV.Nom_Fournisseur|	|Fournisseur|																		
-			|KINTPV.Description|	|Resume|																		
-			|KINTPV.PrixVente_TTC|	|BasePrixHT DeltaPrixHT|																		
-			|KINTPV.QteEnStock|	|Stock|																		
-			|KINTPV.Categorie_ID|	|CategorieID|																		
-			|KINTPV.Collection_ID|	|CollectionID|																		
-			|KINTPV.Attributs_Declinaisons|	|AttributsDeclinaisons|																		
-			|KINTPV.Attributs_Fixes|	|AttributsFixes|																		
-																						
-			|KINTPV.Attr_Genre|	|GENRE|	|Ne pas modifier ce libellé |																	
-			|KINTPV.Attr_Couleur|	|CT|																		
-			|KINTPV.Attr_EAN13_Master|	|CT 1|																		
-																						
-			|KINTPV.TVA|	|16|																		
-|Aliases|		|Classe|	|Nom|	|Valeur|	|Comment|																	
-																						
-|Collections|		|ID*|	|Nom*|	|Type*|	|Numero*|	|Store*|	|DateLancement*|	|OrdreEAN13*|	|DigitsEAN13*|													
-		|1|	|"Mutiny's Spirit"|	|1|	|1|		|20130101|															
-		|2|	|"Stand'Up"|	|5|	|1|		|20150401|															
-																						
-|Categories|		|ID*|	|Nom*|	|EstActif*|	|ParentID*|	|EstRacine*|	|Description*|	|OrdreEAN13*|	|DigitsEAN13*|	|BaliseTitre|	|MotcCles|	|MetaDescr|	|URLSimple|	|URLImage|								
-		|0|	|Nouveautés|	|1|																		
-		|1|	|Essentiel|	|1|																		
-		|2|	|Homme|	|1|																		
-		|20|	|Tee-Shirt|	|1|	|2|																	
-		|200|	|Classique|	|1|	|20|																	
-		|201|	|Marcel|	|1|	|20|																	
-		|202|	|Marcel Col-V|	|1|	|20|																	
-		|203|	|Marcel Col-brodé|	|1|	|20|																	
-		|204|	|Manches-3/4 Col-rond|	|1|	|20|																	
-		|205|	|Manches-3/4 Col-V|	|1|	|20|																	
-		|206|	|Manches-3/4 Col-brodé|	|1|	|20|																	
-		|207|	|Manches-longues Col-rond|	|1|	|20|																	
-		|208|	|Manches-longues Col-V|	|1|	|20|																	
-		|209|	|Manches-longues Col-brodé|	|1|	|20|																	
-		|21|	|Polo|	|1|	|2|																	
-		|22|	|Chemise|	|1|	|2|																	
-		|220|	|"Coupe droite" "Manches courtes"|	|1|	|22|																	
-		|221|	|"Coupe droite" "Manches longues"|	|1|	|22|																	
-		|222|	|"Coupe fit" "Manches courtes"|	|1|	|22|																	
-		|223|	|"Coupe fit" "Manches longues"|	|1|	|22|																	
-		|224|	|"Coupe droite" "Manches courtes" "Col brodé"|	|1|	|22|																	
+XTRA=1 500 XTRA=4 500 XTRA=6 1000|																						
+																										
+		|Valeurs des champs par défaut|			|Les champs obligatoires sont marqués par * dans l'entête de la colonne pour la section. Les champs non positionnés utiliseront les valeurs par défaut définies ci-dessous. |																					
+			|Collections.Store.Default|	|$(Common.Stores)|																						
+			|Collections.OrdreEAN13.Default|	|$(ZERO)|																						
+			|Collections.DigitsEAN13.Default|	|3|																						
+																										
+			|Categories.EstActif.Default|	|1|																						
+			|Categories.ParentID.Default|	|$(NIL)|																						
+			|Categories.EstRacine.Default|	|$(ZERO)|																						
+			|Categories.Description.Default|	|Q( "(@( #(categories $("$(ROW).ID"))  2 1 3 4 5))) |																						
+			|Categories.OrdreEAN13.Default|	|3|																						
+			|Categories.DigitsEAN13.Default|	|3|																						
+																										
+			|Attributs.Type.Default|	|select|		|Other values are : "color" et radio-buttons (what is the code for prestashop)|																				
+																										
+			|Produits.Op.Default|	|NOP|																						
+			|Produits.EstActif.Default|	|Q( $("Categories.$("$(ROW).CategorieID").EstActif") )|																						
+			|Produits.Store.Default|	|Q( $("Collections.$("$(ROW).CollectionID").Store") )|																						
+			|Produits.Nom.Default|	|NO NAME|																						
+			|Produits.Marque.Default|	|MUTINY TAHITI|																						
+			|Produits.Fournisseur.Default|	|KOKOLO|																						
+			|Produits.BasePrixHT.Default|	|Q( #(produit_prix_base))|																						
+			|Produits.DeltaPrixHT.Default|	|Q( #(produit_supplement_prix_base))|																						
+			|Produits.FacteurPrix.Default|	|1|																						
+			|Produits.EAN13.Default|	|Q(  #(ean13 #(produit_ean13_data)))|																						
+			|Produits.Resume.Default|	|Q( "( !(:join-with $(CR))   #(resume_produit)))|																						
+																										
+		|Formules MuffinMC|																								
+			|categories|	|F( ?( $(#) #(self $("Categories.$(_1).ParentID"))) $("Categories.$(_1).Nom") ) |																						
+			|categories_ids|	|F( ?( $(#) #(self $("Categories.$(_1).ParentID"))) $(_1)) |																						
+		|*|	|produit_top_categorie|	|F( @( #(categories $("$(ROW).CategorieID")) 1))|																						
+		|*|	|produit_sous_categorie|	|F( @( #(categories $("$(ROW).CategorieID")) 2))|																						
+			|produit_top_categorie_id|	|F( @( #(categories_ids $("$(ROW).CategorieID")) 1))|																						
+																										
+			|ean13_collection|	|F(  #(+ #(* $("Collections.$(_1).Type") 100) $("Collections.$(_1).Numero")) $("Collections.$(_1).L(Ordre Digits)EAN13"))|																						
+			|ean13_categorie|	|F( $(_1) $("Categories.$(_1).L(Ordre Digits)EAN13")) |																						
+		|*|	|ean13_attribut|	|F( #(1- $(_2))  $("$(_1).L(Ordre Digits)EAN13") )|																						
+			|produit_ean13_data|	|F( #(ean13_collection $("$(ROW).CollectionID"))     #(ean13_categorie $("$(ROW).CategorieID"))     #(map '( #(ean13_attribut S( !( :split-on =) _1)))  #(attributs_produit))    )|																						
+																										
+			|attributs_produit|	|F( S("$(ROW).AttributsL(Fixes Declinaisons)") )|			|Ex : #(attributs_produit) → FAB=4  MODEL=2  TH=3  CT=5  XTRA=5|																			
+			|attribut_produit|	|F( ~( !(:return-element) #(attributs_produit) "$(_1)=*"))       |			|Ex : #(attribut_produit MODEL) → MODEL=2|																			
+			|index_attribut_produit|	|F( ~( #(attributs_produit) "$(_1)=*" ))      |			|Ex : #(index_attribut_produit FAB) → 4|																			
+			|valeur_attribut_produit|	|F( @( $($(_1)) #(index_attribut_produit $(_1)) ))       |			|Ex : #(valeur_attribut_produit FAB) → 100 % Coton|																			
+			|valeur_attributs_produit|	|F(  "( !( :join-with /) #(map valeur_attribut_produit $(@)) )) |																						
+			|produit_attribut_genre_id|	|F( #(1+ #(produit_top_categorie_id)))|																						
+			|resume_produit|	|F( "Collection "( !(:quote) $("Collections.$("$(ROW).CollectionID").Nom")) – #(valeur_attribut_produit MODEL)"  "$("Categories.$("$(ROW).CategorieID").Description") - #(valeur_attribut_produit XTRA)" #(valeur_attribut_produit FAB)  #(valeur_attributs_produit TH TF TE CT) ) |																						
+																										
+			|produit_prix_base|	|F( P( =(Cat A(CAT= #(categories_ids $("$(ROW).CategorieID"))))   #(+ #(assoc L( $(Cat) "COL=$("$(ROW).CollectionID")" "#(attribut_produit FAB)/$(Cat)") $(Liste_Prix_Base)))  )) |																						
+			|produit_supplement_prix_base|	|F( #(+ #(assoc #(attributs_produit) $(Liste_Supplements_Prix))) )|																						
+																										
+			|show|	|F("$(#) arguments : ("(!(:join-with ")(") $(@)))")|																						
+																										
+																										
+		|Equivalence CGM <> KINTPV|																								
+			|KINTPV.Code_Barre|	|EAN13|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Nom_Article|	|Nom|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Marque|	|Marque|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Nom_Fournisseur|	|Fournisseur|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Description|	|Resume|	|Ne pas modifier ce libellé |																					
+			|KINTPV.PrixVente_TTC|	|BasePrixHT DeltaPrixHT|	|Ne pas modifier ce libellé |																					
+			|KINTPV.QteEnStock|	|Stock|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Categorie_ID|	|CategorieID|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Collection_ID|	|CollectionID|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Attributs_Declinaisons|	|AttributsDeclinaisons|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Attributs_Fixes|	|AttributsFixes|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Est_Actif|	|EstActif|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Operation|	|Op|																						
+			|KINTPV.Store|	|Store|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Reference_Produit|	|ReferenceProduit|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Attr_Genre|	|GENRE|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Attr_Couleur|	|CT|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Attr_EAN13_Master|	|CT 1|	|Ne pas modifier ce libellé |																					
+																										
+			|KINTPV.TVA|	|16|	|Ne pas modifier ce libellé |																					
+																										
+		|Divers objets|	|Nom objet|	|Valeur objet|	|Les champs obligatoires sont marqués par * dans l'entête de la colonne pour la section. Les champs non positionnés utiliseront les valeurs par défaut définies ci-dessous. |																					
+			|Store.PPT|	|PPT|	|Un des magasins définis par l'objet "Common.Store"|																					
+																										
+																										
+																										
+|Aliases|		|Classe|	|Nom|	|Valeur|	|Comment|																					
+																										
+|Collections|		|ID*|	|Nom*|	|Type*|	|Numero*|	|Store*|	|DateLancement*|	|OrdreEAN13*|	|DigitsEAN13*|																	
+		|1|	|"Mutiny's Spirit"|	|1|	|1|		|20130101|																			
+		|2|	|"Stand'Up"|	|5|	|1|		|20150401|																			
+																										
+|Categories|		|ID*|	|Nom*|	|EstActif*|	|ParentID*|	|EstRacine*|	|Description*|	|OrdreEAN13*|	|DigitsEAN13*|	|BaliseTitre|	|MotcCles|	|MetaDescr|	|URLSimple|	|URLImage|												
+		|0|	|Nouveautés|																							
+		|1|	|Essentiel|																							
+		|2|	|Homme|																							
+		|20|	|Tee-Shirt|		|2|																					
+		|200|	|Classique|		|20|																					
+		|201|	|Marcel|		|20|																					
+		|202|	|Marcel Col-V|		|20|																					
+		|203|	|Marcel Col-brodé|		|20|																					
+		|204|	|Manches-3/4 Col-rond|		|20|																					
+		|205|	|Manches-3/4 Col-V|		|20|																					
+		|206|	|Manches-3/4 Col-brodé|		|20|																					
+		|207|	|Manches-longues Col-rond|		|20|																					
+		|208|	|Manches-longues Col-V|		|20|																					
+		|209|	|Manches-longues Col-brodé|		|20|																					
+		|21|	|Polo|		|2|																					
+		|22|	|Chemise|		|2|																					
+		|220|	|"Coupe droite" "Manches courtes"|		|22|																					
+		|221|	|"Coupe droite" "Manches longues"|		|22|																					
+		|222|	|"Coupe fit" "Manches courtes"|		|22|																					
+		|223|	|"Coupe fit" "Manches longues"|		|22|																					
+		|224|	|"Coupe droite" "Manches courtes" "Col brodé"|		|22|																					
 		|225|	|"Coupe droite" "Manches longues"
-"Col brodé"|	|1|	|22|																	
+"Col brodé"|		|22|																					
 		|226|	|"Coupe fit" "Manches courtes"
-"Col brodé"|	|1|	|22|																	
+"Col brodé"|		|22|																					
 		|227|	|"Coupe fit" "Manches longues"
-"Col brodé"|	|1|	|22|																	
-		|23|	|Sweat-Shirt|	|1|	|2|																	
-		|24|	|Pull-Débardeur|	|1|	|2|																	
-		|25|	|Short-Bermuda|	|1|	|2|																	
-		|26|	|Pantalon|	|1|	|2|																	
-		|27|	|"Vestes et Blousons"|	|1|	|2|																	
-		|28|	|Sous-Vêtement|	|1|	|2|																	
-		|29|	|Accessoire|	|1|	|2|																	
-		|3|	|Femme|	|1|																		
-		|30|	|Tee-Shirt|	|1|	|3|																	
-		|31|	|Polo|	|1|	|3|																	
-		|32|	|Chemise|	|1|	|3|																	
-		|33|	|SweatShirt|	|1|	|3|																	
-		|34|	|Pull-Débardeur|	|1|	|3|																	
-		|35|	|Short-Bermuda|	|1|	|3|																	
-		|36|	|Pantalon|	|1|	|3|																	
-		|37|	|"Vestes et Blousons"|	|1|	|3|																	
-		|38|	|Sous-Vêtement|	|1|	|3|																	
-		|39|	|Accessoire|	|1|	|3|																	
-		|4|	|Enfant|	|1|																		
-		|40|	|Fille|	|1|	|4|																	
-		|41|	|Garçon|	|1|	|4|																	
-		|5|	|Outdoor|	|1|																		
-		|50|	|Biking|	|1|	|5|																	
-		|51|	|Exploration|	|1|	|5|																	
-		|52|	|Rame|	|1|	|5|																	
-		|53|	|Surf|	|1|	|5|																	
-		|54|	|Voile|	|1|	|5|																	
-		|6|	|Maison|	|1|																		
-		|7|	|Déco|	|1|																		
-																						
-|Attributs|		|ID*|	|Code*|	|Nom*|	|OrdreEAN13*|	|DigitsEAN13*|	|Type*|	|Valeurs*|														
-		|1|	|MODEL|	|Modèle|	|6|	|1|		|"Save The Whales" "Taste Of Paradise" "Washing Machine" "Stars Lovers" "Spirit Of Pacific" "Custom Your Life" "Polo 89" Teahupoo "Matavai Bay" "Ship Of Freedom" "Enjoy Coconuts" Vespa Kalachnikov|														
-		|2|	|XTRA|	|Extras|	|7|	|1|		|Capuche "Dos-nageur" Bretelles "Ouverture zippée" "Ouverture boutons" "Maille piquée"|														
-		|3|	|FAB|	|Composition|	|8|	|1|		|Cuir Daim "Pure Soie" "100% Coton" Laine Elasthane Paille Polyester Viscose|														
-		|4|	|TH|	|Taille|	|9|	|1|		|XS S M L XL XXL 52 54 56 58|														
-		|5|	|TF|	|Taille|	|9|	|1|		|XS S M L XL XXL 52 54 56 58|														
-		|6|	|TE|	|Taille|	|9|	|1|		|1A 2A 3A 4A 5A 6A 8A 10A 12A 14A|														
-		|7|	|CT|	|Couleur_Texture|	|10|	|2|		|FAKE "HEATHER TAN" "HEATHER NAVY" "HEATHER BROWN" "DEEP HEATHER" BROWN NAVY OLIVE ASPHALTE MIDNIGHT "LIGHT BLUE/GREY" BROWN/TAN "CANVAS RED/GREY" KHAKI "SKY BLUE" PURPLE "DARK GREY" "USED VIOLET" "SPORT GREY" SAND "USED RASPBERRY"|														
-		|8|	|GENRE|	|Genre|	|$(ZERO)|	|$(ZERO)|		|#(map   '($("Categories[$(_1)].Nom"))  #(grep F( #(< $("Categories[$(_1)].ID") 10)) #(.. 1 $(Categories.#))))|														
-																						
-|Produits|	|Op*|	|CollectionID*|	|CategorieID*+|	|AttributsFixes|	|AttributsDeclinaisons+|	|Nom*|	|Marque*|	|Fournisseur*|	|BasePrixHT*|	|DeltaPrixHT*|	|BasePoids*|	|DeltaPoids*|	|Stock*|	|EAN13*|	|LxPxH|	|Resume*|	|Description*|	|BaliseTitre|	|MotsCles|	|MetaDescr|	|URLSimple|	|URLImage*|
-		|2|	|220 222 224|	|Q(  "FAB=3 GENRE=#(produit_attribut_genre_id)"  )|	|"A(MODEL= 3 4)  A(TH= 3 4 5)  A(CT= 5 6 7)   A(XTRA= 4 5 6)"|	|"Chemise pure soie"|					|$(ZERO)|	|$(ZERO)|	|10|				|Description|					|URLImage|
-																						
-|Lookup|			|Expression |	|Valeur|																		
-			|$(MODEL)|		|Q("Genre=#(1+ #(produit_top_categorie_id))")   FAB=3|																	
-			|$(MODEL[1])|																			
-			|$(MODEL[2])|																			
-			|$(MODEL[3])|																			
-			|$("MODEL[Mutiny Vintage]")|																			
-			|$(MODEL[Vespa])|																			
-			|$(MODEL[Kalachnikov])|																			
-			|$(MODEL.ID)|																			
-			|$(MODEL.Code)|																			
-			|$(MODEL.Nom)|																			
-			|$(MODEL.OdreEAN13)|																			
-			|$(MODEL.DigitsEAN13)|																			
-			|$(MODEL.Type)|																			
-			|$(MODEL.Valeurs)|																			
-			|#(show-args  $(FAB))|																			
+"Col brodé"|		|22|																					
+		|23|	|Sweat-Shirt|		|2|																					
+		|24|	|Pull-Débardeur|		|2|																					
+		|25|	|Short-Bermuda|		|2|																					
+		|26|	|Pantalon|		|2|																					
+		|27|	|"Vestes et Blousons"|		|2|																					
+		|28|	|Sous-Vêtement|		|2|																					
+		|29|	|Accessoire|		|2|																					
+		|3|	|Femme|																							
+		|30|	|Tee-Shirt|		|3|																					
+		|31|	|Polo|		|3|																					
+		|32|	|Chemise|		|3|																					
+		|33|	|SweatShirt|		|3|																					
+		|34|	|Pull-Débardeur|		|3|																					
+		|35|	|Short-Bermuda|		|3|																					
+		|36|	|Pantalon|		|3|																					
+		|37|	|"Vestes et Blousons"|		|3|																					
+		|38|	|Sous-Vêtement|		|3|																					
+		|39|	|Accessoire|		|3|																					
+		|4|	|Enfant|																							
+		|40|	|Fille|		|4|																					
+		|41|	|Garçon|		|4|																					
+		|5|	|Outdoor|																							
+		|50|	|Biking|		|5|																					
+		|51|	|Exploration|		|5|																					
+		|52|	|Rame|		|5|																					
+		|53|	|Surf|		|5|																					
+		|54|	|Voile|		|5|																					
+		|6|	|Maison|																							
+		|7|	|Déco|																							
+																										
+|Attributs|		|ID*|	|Code*|	|Nom*|	|OrdreEAN13*|	|DigitsEAN13*|	|Type*|	|Valeurs*|																		
+		|1|	|MODEL|	|Modèle|	|6|	|1|		|"Save The Whales" "Taste Of Paradise" "Washing Machine" "Stars Lovers" "Spirit Of Pacific" "Custom Your Life" "Polo 89" Teahupoo "Matavai Bay" "Ship Of Freedom" "Enjoy Coconuts" Vespa Kalachnikov|																		
+		|2|	|XTRA|	|Extras|	|7|	|1|		|Capuche "Dos-nageur" Bretelles "Ouverture zippée" "Ouverture boutons" "Maille piquée"|																		
+		|3|	|FAB|	|Composition|	|8|	|1|		|Cuir Daim "Pure Soie" "100% Coton" Laine Elasthane Paille Polyester Viscose|																		
+		|4|	|TH|	|Taille|	|9|	|1|		|XS S M L XL XXL 52 54 56 58|																		
+		|5|	|TF|	|Taille|	|9|	|1|		|XS S M L XL XXL 52 54 56 58|																		
+		|6|	|TE|	|Taille|	|9|	|1|		|1A 2A 3A 4A 5A 6A 8A 10A 12A 14A|																		
+		|7|	|CT|	|Couleur_Texture|	|10|	|2|		|FAKE "HEATHER TAN" "HEATHER NAVY" "HEATHER BROWN" "DEEP HEATHER" BROWN NAVY OLIVE ASPHALTE MIDNIGHT "LIGHT BLUE/GREY" BROWN/TAN "CANVAS RED/GREY" KHAKI "SKY BLUE" PURPLE "DARK GREY" "USED VIOLET" "SPORT GREY" SAND "USED RASPBERRY"|																		
+		|8|	|GENRE|	|Genre|	|$(ZERO)|	|$(ZERO)|		|#(map   '($("Categories[$(_1)].Nom"))  #(grep F( #(< $("Categories[$(_1)].ID") 10)) #(.. 1 $(Categories.#))))|																		
+																										
+|Produits|	|Op*|	|CollectionID*|	|CategorieID*+|	|Store*|	|EstActif*|	|AttributsFixes|	|AttributsDeclinaisons+|	|Nom*|	|Marque*|	|Fournisseur*|	|BasePrixHT*|	|DeltaPrixHT*|	|FacteurPrix*|	|BasePoids*|	|DeltaPoids*|	|Stock*|	|EAN13*|	|ReferenceProduit|	|LxPxH|	|Resume*|	|Description*|	|BaliseTitre|	|MotsCles|	|MetaDescr|	|URLSimple|	|URLImage*|
+	|CREA|	|2|	|220 222 224|			|Q(  "FAB=3 GENRE=#(produit_attribut_genre_id)"  )|	|"A(MODEL= 3 4)  A(TH= 3 4 5)  A(CT= 5 6 7)   A(XTRA= 4 5 6)"|	|"Chemise pure soie"|						|$(ZERO)|	|$(ZERO)|	|10|					|Description|					|URLImage|
+	|nop|	|2|	|220|			|Q(  "FAB=3 GENRE=#(produit_attribut_genre_id)"  )|	|"MODEL=3 TH=4 CT=6 XTRA=4"|	|"Chemise pure soie"|						|$(ZERO)|	|$(ZERO)|	|10|					|Description|					|URLImage|
+	|nop|	|2|	|222|			|Q(  "FAB=3 GENRE=#(produit_attribut_genre_id)"  )|	|"MODEL=3 TH=5 CT=6 XTRA=6"|	|"Chemise pure soie"|						|$(ZERO)|	|$(ZERO)|	|10|					|Description|					|URLImage|
+	|nop|	|2|	|224|			|Q(  "FAB=3 GENRE=#(produit_attribut_genre_id)"  )|	|"MODEL=3 TH=6 CT=7 XTRA=6"|	|"Chemise pure soie"|						|$(ZERO)|	|$(ZERO)|	|10|					|Description|					|URLImage|
+																										
+|Lookup|			|Expression |	|Valeur|																						
+			|$(MODEL)|		|Q("Genre=#(1+ #(produit_top_categorie_id))")   FAB=3|																					
+			|$(MODEL[1])|																							
+			|$(MODEL[2])|																							
+			|$(MODEL[3])|																							
+			|$("MODEL[Mutiny Vintage]")|																							
+			|$(MODEL[Vespa])|																							
+			|$(MODEL[Kalachnikov])|																							
+			|$(MODEL.ID)|																							
+			|$(MODEL.Code)|																							
+			|$(MODEL.Nom)|																							
+			|$(MODEL.OdreEAN13)|																							
+			|$(MODEL.DigitsEAN13)|																							
+			|$(MODEL.Type)|																							
+			|$(MODEL.Valeurs)|																							
+			|#(show-args  $(FAB))|																							

@@ -138,6 +138,7 @@ sub parse_row {
         # Per-Section specialized parsing and record generation
         # Syntactic / Semantic error are set in $section->has_error() 
         $section->generate_records($row);
+
         traceout( );
         return $section;
     }
