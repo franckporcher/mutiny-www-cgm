@@ -292,9 +292,14 @@ my %kintpv_template;
     PrixVente_TTC   => [ 14, 14, 
             sub { 
                 my (@prix) = values_ktpv_field('PrixVente_TTC');
+
                 my $prix   = 0;
                 $prix += $_ foreach @prix;
-                return $prix;
+
+                my $facteur_prix = values_ktpv_field('facteur_Prix');
+                $facteur_prix = 1 unless defined $facteur_prix;
+
+                return $prix * $facteur_prix;
     }],
     
     # 16. Date application du prix de vente TTC

@@ -60,22 +60,24 @@ XTRA=1 500 XTRA=4 500 XTRA=6 1000|
 			|show|	|F("$(#) arguments : ("(!(:join-with ")(") $(@)))")|																						
 																										
 																										
-		|Equivalence CGM <> KINTPV|																								
-			|KINTPV.Code_Barre|	|EAN13|	|Ne pas modifier ce libellé |																					
+		|Mapping CGM-Produits →  KINTPV|																								
+			|KINTPV.Operation|	|Op|																						
+			|KINTPV.Collection_ID|	|CollectionID|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Categorie_ID|	|CategorieID|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Store|	|Store|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Est_Actif|	|EstActif|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Attributs_Fixes|	|AttributsFixes|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Attributs_Declinaisons|	|AttributsDeclinaisons|	|Ne pas modifier ce libellé |																					
 			|KINTPV.Nom_Article|	|Nom|	|Ne pas modifier ce libellé |																					
 			|KINTPV.Marque|	|Marque|	|Ne pas modifier ce libellé |																					
 			|KINTPV.Nom_Fournisseur|	|Fournisseur|	|Ne pas modifier ce libellé |																					
-			|KINTPV.Description|	|Resume|	|Ne pas modifier ce libellé |																					
 			|KINTPV.PrixVente_TTC|	|BasePrixHT DeltaPrixHT|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Facteur_Prix|	|FacteurPrix|																						
 			|KINTPV.QteEnStock|	|Stock|	|Ne pas modifier ce libellé |																					
-			|KINTPV.Categorie_ID|	|CategorieID|	|Ne pas modifier ce libellé |																					
-			|KINTPV.Collection_ID|	|CollectionID|	|Ne pas modifier ce libellé |																					
-			|KINTPV.Attributs_Declinaisons|	|AttributsDeclinaisons|	|Ne pas modifier ce libellé |																					
-			|KINTPV.Attributs_Fixes|	|AttributsFixes|	|Ne pas modifier ce libellé |																					
-			|KINTPV.Est_Actif|	|EstActif|	|Ne pas modifier ce libellé |																					
-			|KINTPV.Operation|	|Op|																						
-			|KINTPV.Store|	|Store|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Code_Barre|	|EAN13|	|Ne pas modifier ce libellé |																					
 			|KINTPV.Reference_Produit|	|ReferenceProduit|	|Ne pas modifier ce libellé |																					
+			|KINTPV.Description|	|Resume|	|Ne pas modifier ce libellé |																					
+																										
 			|KINTPV.Attr_Genre|	|GENRE|	|Ne pas modifier ce libellé |																					
 			|KINTPV.Attr_Couleur|	|CT|	|Ne pas modifier ce libellé |																					
 			|KINTPV.Attr_EAN13_Master|	|CT 1|	|Ne pas modifier ce libellé |																					
